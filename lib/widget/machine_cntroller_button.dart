@@ -6,14 +6,20 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 
-class MachineControllerButton extends SpriteComponent  with TapCallbacks{
-  MachineControllerButton({required this.onTap}) : super(size: Vector2(154, 147));
+class MachineControllerButton extends SpriteComponent  with TapCallbacks {
+  MachineControllerButton({super.size,super.position,required this.onTap,required this.iconPath}) : super();
   final void Function() onTap;
-  late Function onTapCallbackHandler;
+  final String iconPath;
+
+
+  Future<void> updateIconPath(String path) async {
+
+    sprite = await Sprite.load(path);
+  }
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load('icons/button01.png');
+    sprite = await Sprite.load(iconPath);
     super.onLoad();
 
   }
@@ -31,7 +37,8 @@ class MachineControllerButton extends SpriteComponent  with TapCallbacks{
   @override
   void onTapDown(TapDownEvent event) {
     super.onTapDown(event);
-    onTap();
+    print('onTapDown');
+    onTap.call();
   }
 
 }

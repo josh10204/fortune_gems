@@ -47,7 +47,7 @@ class TurntableComponent extends PositionComponent {
   Future<void> startLottery() async {
     _zoomEffect(
       onZoomOutComplete: () {
-        priority = 3;
+        priority = 4;
       },
       onZoomInComplete: () async {
         _showBackgroundComponent();

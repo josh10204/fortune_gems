@@ -15,7 +15,6 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
   late SpriteComponent _machineFrame;
   late MachineBannerComponent _machineBanner;
-  late MachineControllerComponent _machineControllerComponent;
   late MachineRollerComponent _firstMachineRollerComponent;
   late MachineRollerComponent _secondMachineRollerComponent;
   late MachineRollerComponent _thirdMachineRollerComponent;
@@ -26,11 +25,21 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   bool _isEnableRolling = true;
 
 
+
+  void startRollingMachine(){
+    _startRolling();
+  }
+  void autoRollingMachine(bool isEnable){}
+
   void updateEnableRoller(bool isEnable){
     _isEnableRolling = isEnable;
   }
 
   Future<void> _startRolling() async {
+
+    if(_isStartRolling || !_isEnableRolling){
+      return;
+    }
     _isStartRolling = true;
     for(MachineRollerComponent machineRollerComponent in _rollers){
       machineRollerComponent.startRolling();
@@ -105,14 +114,6 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     add(_machineBanner);
   }
 
-
-
-  void _intiMachineControllerComponent(){
-    _machineControllerComponent  = MachineControllerComponent(anchor: Anchor.center,position: size/2);
-    add(_machineControllerComponent);
-
-  }
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -126,9 +127,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
   @override
   void onTapDown(TapDownEvent event) {
-    if(!_isStartRolling &&_isEnableRolling){
-      _startRolling();
-    }
+    _startRolling();
     super.onTapDown(event);
 
   }

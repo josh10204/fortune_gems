@@ -6,12 +6,12 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/widget/machine_raise_menu.dart';
+import 'package:fortune_gems/widget/machine_bet_menu.dart';
 
-class MachineRaiseMenuButton extends PositionComponent  with TapCallbacks {
-  MachineRaiseMenuButton({super.position,required this.raiseItems,required this.isSelectItem, required this.onTap}) : super();
-  final void Function(RaiseItems) onTap;
-  final RaiseItems raiseItems;
+class MachineBetMenuButton extends PositionComponent  with TapCallbacks {
+  MachineBetMenuButton({super.position,required this.betItems,required this.isSelectItem, required this.onTap}) : super();
+  final void Function(BetItems) onTap;
+  final BetItems betItems;
 
   bool isSelectItem;
   late RectangleComponent _backgroundComponent;
@@ -38,7 +38,7 @@ class MachineRaiseMenuButton extends PositionComponent  with TapCallbacks {
 
   void _initText(){
     _textComponent = TextComponent(
-      text:'${raiseItems.raiseAmount}',
+      text:'${betItems.betAmount}',
       textRenderer: TextPaint(
         style: TextStyle(
           fontSize: 48.0,
@@ -72,10 +72,10 @@ class MachineRaiseMenuButton extends PositionComponent  with TapCallbacks {
 
   @override
   void onTapDown(TapDownEvent event) {
-    print('${raiseItems.raiseAmount}');
+    print('${betItems.betAmount}');
 
     super.onTapDown(event);
-    onTap.call(raiseItems);
+    onTap.call(betItems);
   }
 
 }

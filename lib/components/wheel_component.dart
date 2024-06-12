@@ -4,12 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/model/turntable_item_model.dart';
+import 'package:fortune_gems/model/wheel_item_model.dart';
 
 
-enum TurntableRotateStatus {
+enum WheelRotateStatus {
   starting,
-  speed_up,
+  speedUp,
   decelerating,
   bounce,
   stopping,
@@ -17,17 +17,17 @@ enum TurntableRotateStatus {
 
 }
 
-class TurntableComponent extends PositionComponent {
-  TurntableComponent({super.position,super.anchor ,required this.onCallBack}) : super(size: Vector2(1290, 2796));
+class WheelComponent extends PositionComponent {
+  WheelComponent({super.position,super.anchor ,required this.onCallBack}) : super(size: Vector2(1290, 2796));
   final void Function() onCallBack;
 
 
-  TurntableRotateStatus _rotateStatus = TurntableRotateStatus.starting;
+  WheelRotateStatus _rotateStatus = WheelRotateStatus.starting;
   late RectangleComponent _backgroundComponent;
-  late SpriteComponent _turntable;
-  late SpriteComponent _turntableFrame;
-  late SpriteComponent _turntableSelectFrame;
-  List<TurntableItemModel> _turntableItemList = [];
+  late SpriteComponent _wheel;
+  late SpriteComponent _wheelFrame;
+  late SpriteComponent _wheelSelectFrame;
+  List<WheelItemModel> _wheelItemList = [];
 
   static const double _rotationLowSpeedAngle = 1 * 3.14 / 180;
   static const double _rotationHighSpeedAngle = 45 * 3.14 / 180;
@@ -37,12 +37,12 @@ class TurntableComponent extends PositionComponent {
   double _bounceRangeStartAngle = 0;
   double _bounceRangeEndAngle = 0;
 
-  late TurntableItemModel _stopTurntableItemModel;
+  late WheelItemModel _stopWheelItemModel;
   /// 測試暫時數據
-  static const int _turntableItemTotal = 12;//轉盤格數
+  static const int _wheelItemTotal = 12;//轉盤格數
   static const int _stopItemSerial = 2;//停止轉盤格子編號
 
-  double _waitingTime = 0;
+  Timer _waitUpdateTimer = Timer(1);
 
   Future<void> startLottery() async {
     _zoomEffect(
@@ -53,13 +53,13 @@ class TurntableComponent extends PositionComponent {
         _showBackgroundComponent();
         // add(RectangleComponent(priority:0,size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5)));
         /// 測試暫時數據
-        _stopTurntableItemModel = _turntableItemList[_stopItemSerial];
-        _bounceRangeStartAngle = _stopTurntableItemModel.startAngle;
-        _bounceRangeEndAngle = _stopTurntableItemModel.endAngle;
+        _stopWheelItemModel = _wheelItemList[_stopItemSerial];
+        _bounceRangeStartAngle = _stopWheelItemModel.startAngle;
+        _bounceRangeEndAngle = _stopWheelItemModel.endAngle;
         await Future.delayed(const Duration(milliseconds: 500));
-        _rotateStatus = TurntableRotateStatus.speed_up;
+        _rotateStatus = WheelRotateStatus.speedUp;
         await Future.delayed(const Duration(seconds: 1));
-        _rotateStatus = TurntableRotateStatus.decelerating;
+        _rotateStatus = WheelRotateStatus.decelerating;
         await Future.delayed(const Duration(seconds: 1));
       },
     );
@@ -103,25 +103,25 @@ class TurntableComponent extends PositionComponent {
 
   @override
   Future<void> onLoad() async {
-    _loadTurntableItemList();
-    await _initTurntable();
-    await _initTurntableFrame();
-    await _initTurntableSelectFrame();
-    // _initTurntableItem();
+    _loadWheelItemList();
+    await _initWheel();
+    await _initWheelFrame();
+    await _initWheelSelectFrame();
+    // _initWheelItem();
     super.onLoad();
   }
-  void _loadTurntableItemList(){
 
+  void _loadWheelItemList(){
     //每個item 佔據的角度
-    double itemAngle = 360/_turntableItemTotal;
+    double itemAngle = 360/_wheelItemTotal;
     double spacingAngle = itemAngle/2 * 3.14 / 180;
 
-    for(int i = 0 ;i <_turntableItemTotal;i++){
+    for(int i = 0 ;i <_wheelItemTotal;i++){
       double centerAngle = itemAngle * i * 3.14 / 180;
       double startAngle  = centerAngle - spacingAngle;
       double endAngle = centerAngle + spacingAngle;
-      TurntableItemModel model = TurntableItemModel(serial:i,startAngle: startAngle,endAngle:endAngle,centerAngle:centerAngle);
-      _turntableItemList.add(model);
+      WheelItemModel model = WheelItemModel(serial:i,startAngle: startAngle,endAngle:endAngle,centerAngle:centerAngle);
+      _wheelItemList.add(model);
     }
   }
   void initBasicComponent(){
@@ -129,19 +129,19 @@ class TurntableComponent extends PositionComponent {
     // add();
   }
 
-  Future<void> _initTurntable() async {
-    _turntable  = SpriteComponent(sprite: await Sprite.load('images/turntable.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 1);
-    add(_turntable);
+  Future<void> _initWheel() async {
+    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 1);
+    add(_wheel);
   }
 
-  Future<void> _initTurntableFrame() async {
-    _turntableFrame  = SpriteComponent(sprite: await Sprite.load('images/turntable_frame.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 2);
-    add(_turntableFrame);
+  Future<void> _initWheelFrame() async {
+    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 2);
+    add(_wheelFrame);
   }
 
-  Future<void> _initTurntableSelectFrame() async {
-    _turntableSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/turntable_select_frame.png'),size: Vector2(382.5,685),position: Vector2(localCenter.x,localCenter.y-245),anchor: Anchor.center,priority: 3);
-    add(_turntableSelectFrame);
+  Future<void> _initWheelSelectFrame() async {
+    _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(382.5,685),position: Vector2(localCenter.x,localCenter.y-245),anchor: Anchor.center,priority: 3);
+    add(_wheelSelectFrame);
   }
 
 
@@ -149,13 +149,13 @@ class TurntableComponent extends PositionComponent {
   void update(double dt) {
     super.update(dt);
     switch(_rotateStatus){
-      case TurntableRotateStatus.starting:
+      case WheelRotateStatus.starting:
         _rotationOffsetAngle(angle: _rotationLowSpeedAngle);
         break;
-      case TurntableRotateStatus.speed_up:
+      case WheelRotateStatus.speedUp:
         _rotationOffsetAngle(angle: _rotationHighSpeedAngle);
         break;
-      case TurntableRotateStatus.decelerating:
+      case WheelRotateStatus.decelerating:
         if(_currentRollingSpeedAngle > 0.3){
           _currentRollingSpeedAngle -=0.06;
           _rotationOffsetAngle(angle: _currentRollingSpeedAngle);
@@ -163,7 +163,7 @@ class TurntableComponent extends PositionComponent {
           _decelerateOffsetAngle(angle: _currentRollingSpeedAngle);
         }
         break;
-      case TurntableRotateStatus.bounce:
+      case WheelRotateStatus.bounce:
         double bounceOffset = (_bounceRangeEndAngle-_bounceRangeStartAngle) *0.4;
         if (_isBounceForward) {
           _bounceForwardOffsetAngle(angle: bounceOffset);
@@ -171,29 +171,29 @@ class TurntableComponent extends PositionComponent {
           _bounceBackOffsetAngle(angle: bounceOffset);
         }
         break;
-      case TurntableRotateStatus.stopping:
+      case WheelRotateStatus.stopping:
         _stoppingOffsetAngle(dt: dt);
         break;
-      case TurntableRotateStatus.stopped:
+      case WheelRotateStatus.stopped:
         _stopped();
         break;
     }
   }
 
   void _rotationOffsetAngle({required double angle}){
-    if(_turntable.angle >=360 * 3.14 / 180){
-      _turntable.angle = 0;
-      _turntableFrame.angle = 0;
+    if(_wheel.angle >=360 * 3.14 / 180){
+      _wheel.angle = 0;
+      _wheelFrame.angle = 0;
     }else{
-      _turntable.angle += angle;
-      _turntableFrame.angle += angle;
+      _wheel.angle += angle;
+      _wheelFrame.angle += angle;
     }
   }
 
   void _decelerateOffsetAngle({required double angle}){
-    if(_turntable.angle >= _bounceRangeStartAngle && _turntable.angle <= _bounceRangeEndAngle){
-      _rotateStatus  =  TurntableRotateStatus.bounce;
-      if(_turntable.angle >=_bounceRangeEndAngle){
+    if(_wheel.angle >= _bounceRangeStartAngle && _wheel.angle <= _bounceRangeEndAngle){
+      _rotateStatus  =  WheelRotateStatus.bounce;
+      if(_wheel.angle >=_bounceRangeEndAngle){
         _isBounceForward = false;
       }else{
         _isBounceForward = true;
@@ -203,52 +203,51 @@ class TurntableComponent extends PositionComponent {
     }
   }
   void _bounceForwardOffsetAngle({required double angle}){
-    if(_turntable.angle >= _bounceRangeEndAngle){
+    if(_wheel.angle >= _bounceRangeEndAngle){
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = false;
-      if(_bounceRangeStartAngle>=_stopTurntableItemModel.centerAngle ||
-          _bounceRangeEndAngle<= _stopTurntableItemModel.centerAngle){
-        _rotateStatus  =  TurntableRotateStatus.stopping;
+      if(_bounceRangeStartAngle>=_stopWheelItemModel.centerAngle ||
+          _bounceRangeEndAngle<= _stopWheelItemModel.centerAngle){
+        _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
-      _turntable.angle += angle;
-      _turntableFrame.angle += angle;
+      _wheel.angle += angle;
+      _wheelFrame.angle += angle;
 
     }
   }
 
   void _bounceBackOffsetAngle({required double angle}){
-    if(_turntable.angle <= _bounceRangeStartAngle){
+    if(_wheel.angle <= _bounceRangeStartAngle){
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = true;
-      if(_bounceRangeStartAngle>=_stopTurntableItemModel.centerAngle ||
-          _bounceRangeEndAngle<= _stopTurntableItemModel.centerAngle){
-        _rotateStatus  =  TurntableRotateStatus.stopping;
+      if(_bounceRangeStartAngle>=_stopWheelItemModel.centerAngle ||
+          _bounceRangeEndAngle<= _stopWheelItemModel.centerAngle){
+        _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
-      _turntable.angle -= angle;
-      _turntableFrame.angle -= angle;
+      _wheel.angle -= angle;
+      _wheelFrame.angle -= angle;
 
     }
 
   }
 
   Future<void> _stoppingOffsetAngle({required double dt})  async {
-    _turntable.angle = _stopTurntableItemModel.centerAngle;
-    _waitingTime += dt;
-    if(_waitingTime >2){
-      _rotateStatus  =  TurntableRotateStatus.stopped;
+    _wheel.angle = _stopWheelItemModel.centerAngle;
+    _waitUpdateTimer.update(dt);
+    if (_waitUpdateTimer.finished) {
+      _rotateStatus  =  WheelRotateStatus.stopped;
+      _waitUpdateTimer = Timer(1);
     }
-
   }
 
   void _stopped()  {
-    _rotateStatus = TurntableRotateStatus.starting;
+    _rotateStatus = WheelRotateStatus.starting;
     _currentRollingSpeedAngle = _rotationHighSpeedAngle;
     _isBounceForward = true;
-    _waitingTime = 0;
     _hideBackgroundComponent();
     _zoomEffect(
       onZoomOutComplete: () {

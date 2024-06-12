@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/widget/machine_cntroller_button.dart';
 
-class MachineSettingMenu extends SpriteComponent  with HasVisibility{
+class MachineSettingMenu extends SpriteComponent  with HasVisibility {
   MachineSettingMenu({super.position,super.size,required this.onTap}) : super();
   final void Function() onTap;
 
@@ -95,7 +95,7 @@ class MachineSettingMenu extends SpriteComponent  with HasVisibility{
   void render(Canvas canvas){
     super.render(canvas);
 
-  }
 
+  }
 
 }

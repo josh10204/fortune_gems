@@ -1,29 +1,27 @@
 
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/game.dart';
 import 'package:flame/particles.dart';
-import 'package:flutter/animation.dart';
-import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/header_component.dart';
 import 'package:fortune_gems/components/machine_component.dart';
 import 'package:fortune_gems/components/machine_controller_component.dart';
-import 'package:fortune_gems/components/turntable_component.dart';
-import 'package:flutter/material.dart';
+import 'package:fortune_gems/components/wheel_component.dart';
+import 'package:fortune_gems/components/winning_component.dart';
+import 'package:fortune_gems/system/global.dart';
+
+
+
 
 
 class GameMain extends FlameGame{
 
+  late Global _global;
   late HeaderComponent _headerComponent;
   late MachineComponent _machineComponent;
-  late TurntableComponent _turntableComponent;
+  late WheelComponent _wheelComponent;
   late MachineControllerComponent _machineControllerComponent;
-
-  // late SlotMachineStartButton startButton;
+  late WinningComponent _winningComponent;
 
   GameMain() : super(camera: CameraComponent.withFixedResolution(width: 1290, height:2796)) {
     // pauseWhenBackgrounded = false;
@@ -32,24 +30,33 @@ class GameMain extends FlameGame{
   }
 
 
-  void _presentTurntable(){
-    _turntableComponent.startLottery();
-    _machineComponent.updateEnableRoller(false);
+  void _showWheelComponent(){
+    _wheelComponent.startLottery();
+    _global.gameStatus = GameStatus.wheelSpinning;
+  }
+
+  Future<void> _showWinningEffectComponent() async {
+    _winningComponent = WinningComponent(
+      anchor: Anchor.center,
+      position: Vector2.zero(),
+      onCallBack: (){
+        _global.gameStatus = GameStatus.idle;
+        _winningComponent.priority = 0;
+        world.remove(_winningComponent);
+      }
+    );
+    _winningComponent.priority = 3;
+    world.add(_winningComponent);
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    // camera.viewport.anchor = Anchor.center;
-    // world.add(RectangleComponent(
-    //     size: Vector2(1280,720), anchor: Anchor.center, paint: Paint()..color = Colors.white.withOpacity(0)));
-    // initStartButton();
-    //
+    _global = Global();
     _initHeaderComponents();
-    _initTurntableComponent();
-    _initMachine();
+    _initWheelComponent();
+    _initMachineComponent();
     _intiMachineControllerComponent();
-
   }
 
   void _initHeaderComponents(){
@@ -60,19 +67,22 @@ class GameMain extends FlameGame{
 
   }
 
-  void _initTurntableComponent(){
-    _turntableComponent = TurntableComponent(anchor: Anchor.center,position: Vector2.zero(),onCallBack: (){
-
-      _machineComponent.updateEnableRoller(true);
-
-    });
-    _turntableComponent.priority = 1;
-    world.add(_turntableComponent);
+  void _initWheelComponent(){
+    _wheelComponent = WheelComponent(
+        anchor: Anchor.center,
+        position: Vector2.zero(),
+        onCallBack: () {
+          ///TODO：判斷是否有中大獎
+          _global.gameStatus = GameStatus.winningEffect;
+          _showWinningEffectComponent();
+        });
+    _wheelComponent.priority = 1;
+    world.add(_wheelComponent);
   }
 
-  void _initMachine()  {
+  void _initMachineComponent()  {
     _machineComponent  = MachineComponent(onCallBack: (){
-      _presentTurntable();
+      _showWheelComponent();
     });
     _machineComponent.priority = 2;
 
@@ -90,7 +100,7 @@ class GameMain extends FlameGame{
       },
       onTapAutoButton: (){},
       onTapSpeedButton: (){},
-      onTapRaiseButton: (){},
+      onTapBetButton: (){},
       onTapSettingButton: (){},
     );
     _machineControllerComponent.priority = 3;

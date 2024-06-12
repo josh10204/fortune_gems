@@ -7,7 +7,7 @@ import 'package:fortune_gems/widget/machine_roller_symbol.dart';
 
 enum RollerType{
   common,
-  addition,
+  special,
 }
 
 enum RollerStatus {
@@ -75,7 +75,7 @@ class MachineRollerComponent extends PositionComponent {
   void onLoad() async {
     _initRollerSymbolList();
 
-    if(rollerType == RollerType.addition){
+    if(rollerType == RollerType.special){
       _initSelectFrame();
     }
 
@@ -106,11 +106,11 @@ class MachineRollerComponent extends PositionComponent {
     List<RollerSymbolModel> allSymbol = _getAllRollerSymbol();
     // int randomIndex = random.nextInt(_slotMachineRollerBlock.length);
     int randomIndex = 1;
-    int randomWinningTotleIndex = random.nextInt(2)+1;
+    int randomWinningTotleIndex = 1;
     int i = 1;
     for(MachineRollerSymbol rollerSymbol in _slotMachineRollerSymbolList){
       bool isStopHeader = i == randomIndex? true:false ;
-      bool isWinningTarget = i<=randomWinningTotleIndex ? true:false;
+      bool isWinningTarget = randomWinningTotleIndex == i ? true:false;
       RollerSymbolModel symbol = allSymbol[random.nextInt(allSymbol.length)];
       symbol.isWinningSymbol= isWinningTarget;
       await rollerSymbol.updateRollerSymbol(model:symbol ,isStopHeader:isStopHeader);
@@ -118,7 +118,6 @@ class MachineRollerComponent extends PositionComponent {
       i++;
     }
     await Future.delayed(const Duration(milliseconds: 500));
-
   }
 
   List<RollerSymbolModel> _getAllRollerSymbol(){
@@ -132,7 +131,7 @@ class MachineRollerComponent extends PositionComponent {
         RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_05.png',unselectImageFilePath: 'icons/symbol_common_unselect_05.png'),
         RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_06.png',unselectImageFilePath: 'icons/symbol_common_unselect_06.png'),
         RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_07.png',unselectImageFilePath: 'icons/symbol_common_unselect_07.png'),
-        RollerSymbolModel(type:RollerSymbolType.special,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_08.png',unselectImageFilePath: 'icons/symbol_common_unselect_08.png'),
+        RollerSymbolModel(type:RollerSymbolType.wild,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_08.png',unselectImageFilePath: 'icons/symbol_common_unselect_08.png'),
       ];
 
     }else{
@@ -208,7 +207,7 @@ class MachineRollerComponent extends PositionComponent {
           //移動Ｙ軸為，目前第一個方塊Y軸 減去 方塊高度
           double positionY = firstRollerSymbol.position.y -_symbolHeight;
           //如果目前第一個方塊是特殊類型（老鷹圖案），因為尺寸不同，所以移動Ｙ軸，則需要加上特殊方塊的中心
-          if(firstRollerSymbol.rollerSymbolModel.type == RollerSymbolType.special) {
+          if(firstRollerSymbol.rollerSymbolModel.type == RollerSymbolType.wild) {
             positionY +=firstRollerSymbol.specialSymbolCenterY;
           }
           slotMachineRollerSymbol.updateRollerSymbolPositionY(positionY);

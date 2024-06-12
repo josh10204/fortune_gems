@@ -1,8 +1,8 @@
 
 
-class TurntableItemModel{
+class WheelItemModel{
 
-  TurntableItemModel({
+  WheelItemModel({
     required this.serial,
     required this.centerAngle,
     required this.startAngle,

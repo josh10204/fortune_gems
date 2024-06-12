@@ -2,7 +2,8 @@
 enum RollerSymbolType{
   common,
   addition,
-  special,
+  wild,
+  wheel,
 }
 
 class RollerSymbolModel{

@@ -36,7 +36,7 @@ class MachineRollerSymbol extends SpriteComponent {
   bool _isAnimation = false;
 
   void updateRollerSymbolPositionY(double positionY){
-    if(rollerSymbolModel.type == RollerSymbolType.special){
+    if(rollerSymbolModel.type == RollerSymbolType.wild){
       priority = 1;
       position.y = positionY - specialSymbolCenterY;
     }else{
@@ -46,7 +46,7 @@ class MachineRollerSymbol extends SpriteComponent {
   }
 
   void stopRollerSymbol(int index){
-    if(rollerSymbolModel.type == RollerSymbolType.special){
+    if(rollerSymbolModel.type == RollerSymbolType.wild){
       size = specialSymbolSize;
       priority = 1;
       double center = specialSymbolSize.y/2 - generalSymbolSize.y/2;
@@ -76,16 +76,12 @@ class MachineRollerSymbol extends SpriteComponent {
   Future<void> updateRollerSymbol({required RollerSymbolModel model ,required bool isStopHeader}) async {
     sprite = await Sprite.load(model.imageFilePath);
     rollerSymbolModel = model;
-    if(rollerSymbolModel.type == RollerSymbolType.special){
+    if(rollerSymbolModel.type == RollerSymbolType.wild){
       size = specialSymbolSize;
       priority = 1;
-      // position = Vector2(baseCenter.x - specialSymbolSize.x/2, position.y);
-
-
     }else{
       size = generalSymbolSize;
       priority = 0;
-      // position = Vector2(baseCenter.x - generalSymbolSize.x/2, position.y);
     }
     _isStopHeader = isStopHeader;
   }
@@ -106,7 +102,6 @@ class MachineRollerSymbol extends SpriteComponent {
       case MachineRollerSymbolStatus.mask:
         sprite = await Sprite.load(rollerSymbolModel.unselectImageFilePath);
         _scaleEffect.pause();
-
         break;
       case MachineRollerSymbolStatus.animation:
         sprite = await Sprite.load(rollerSymbolModel.imageFilePath);
@@ -122,7 +117,7 @@ class MachineRollerSymbol extends SpriteComponent {
   void onLoad() async {
     //Set sprite on load.
     sprite = await Sprite.load(rollerSymbolModel.imageFilePath);
-    if(rollerSymbolModel.type == RollerSymbolType.special){
+    if(rollerSymbolModel.type == RollerSymbolType.wild){
       size = specialSymbolSize;
       // double center = specialSymbolSize.y/2 - generalSymbolSize.y/2;
       priority = 1;

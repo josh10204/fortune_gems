@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:fortune_gems/components/machine_roller_component.dart';
+import 'package:fortune_gems/components/machine_roller/machine_roller_component.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
-import 'package:fortune_gems/widget/machine_roller_symbol.dart';
+import 'package:fortune_gems/components/machine_roller/machine_roller_symbol.dart';
 
 class TestData{
 

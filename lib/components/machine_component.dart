@@ -7,7 +7,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/machine_banner_component.dart';
-import 'package:fortune_gems/components/machine_roller_component.dart';
+import 'package:fortune_gems/components/machine_roller/machine_roller_component.dart';
 import 'package:fortune_gems/components/score_board_component.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/system/global.dart';

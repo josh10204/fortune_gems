@@ -9,12 +9,10 @@ import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/model/image_marquee_model.dart';
 
 enum ImageMarqueeStatus{
-
   starting,
   rolling,
   update,
   stopped,
-
 }
 
 

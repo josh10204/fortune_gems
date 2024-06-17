@@ -5,16 +5,16 @@ import 'package:flame/image_composition.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/widget/machine_cntroller_button.dart';
+import 'package:fortune_gems/widget/icon_button.dart';
 
-class MachineSettingMenu extends SpriteComponent  with HasVisibility {
-  MachineSettingMenu({super.position,super.size,required this.onTap}) : super();
+class SettingMenuComponent extends SpriteComponent  with HasVisibility {
+  SettingMenuComponent({super.position,super.size,required this.onTap}) : super();
   final void Function() onTap;
 
 
-  late MachineControllerButton _spinButton;
-  late MachineControllerButton _aboutButton;
-  late MachineControllerButton _soundButton;
+  late IconButton _spinButton;
+  late IconButton _aboutButton;
+  late IconButton _soundButton;
 
   bool _isMute = false;
 
@@ -37,7 +37,7 @@ class MachineSettingMenu extends SpriteComponent  with HasVisibility {
     double buttonHeight = 88;
     double positonX = localCenter.x - buttonWidth/2;
     double positonY = localCenter.y*0.4 - buttonHeight/2;
-    _spinButton = MachineControllerButton(
+    _spinButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_setting_spin.png',
@@ -50,7 +50,7 @@ class MachineSettingMenu extends SpriteComponent  with HasVisibility {
     double buttonHeight =100;
     double positonX = localCenter.x - buttonWidth/2;
     double positonY = localCenter.y - buttonHeight/2;
-    _aboutButton = MachineControllerButton(
+    _aboutButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_setting_about.png',
@@ -63,7 +63,7 @@ class MachineSettingMenu extends SpriteComponent  with HasVisibility {
     double buttonHeight = 80;
     double positonX = localCenter.x - buttonWidth/2;
     double positonY = localCenter.y *1.6 - buttonHeight/2;
-    _soundButton = MachineControllerButton(
+    _soundButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: _soundIconPath,

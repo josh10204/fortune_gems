@@ -6,8 +6,8 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 
-class MachineControllerButton extends SpriteComponent  with TapCallbacks {
-  MachineControllerButton({super.size,super.position,required this.onTap,required this.iconPath}) : super();
+class IconButton extends SpriteComponent  with TapCallbacks {
+  IconButton({super.size,super.position,required this.onTap,required this.iconPath}) : super();
   final void Function() onTap;
   final String iconPath;
 

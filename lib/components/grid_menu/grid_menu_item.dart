@@ -6,12 +6,12 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/widget/machine_bet_menu.dart';
+import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
 
-class MachineBetMenuButton extends PositionComponent  with TapCallbacks {
-  MachineBetMenuButton({super.position,required this.betItems,required this.isSelectItem, required this.onTap}) : super();
-  final void Function(BetItems) onTap;
-  final BetItems betItems;
+class GridMenuItem extends PositionComponent  with TapCallbacks {
+  GridMenuItem({super.position,required this.gridItems,required this.isSelectItem, required this.onTap}) : super();
+  final void Function(GridItems) onTap;
+  final GridItems gridItems;
 
   bool isSelectItem;
   late RectangleComponent _backgroundComponent;
@@ -38,7 +38,7 @@ class MachineBetMenuButton extends PositionComponent  with TapCallbacks {
 
   void _initText(){
     _textComponent = TextComponent(
-      text:'${betItems.betAmount}',
+      text:gridItems.text,
       textRenderer: TextPaint(
         style: TextStyle(
           fontSize: 48.0,
@@ -72,10 +72,10 @@ class MachineBetMenuButton extends PositionComponent  with TapCallbacks {
 
   @override
   void onTapDown(TapDownEvent event) {
-    print('${betItems.betAmount}');
+    print(gridItems.text);
 
     super.onTapDown(event);
-    onTap.call(betItems);
+    onTap.call(gridItems);
   }
 
 }

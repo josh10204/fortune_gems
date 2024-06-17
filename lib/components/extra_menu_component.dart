@@ -7,18 +7,18 @@ import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/widget/machine_cntroller_button.dart';
+import 'package:fortune_gems/widget/icon_button.dart';
 
-class MachineExtraMenu extends PositionComponent  with HasVisibility{
-  MachineExtraMenu({super.position,super.size,required this.onTap}) : super();
+class ExtraMenuComponent extends PositionComponent  with HasVisibility{
+  ExtraMenuComponent({super.position,super.size,required this.onTap}) : super();
   final void Function() onTap;
 
 
   late PositionComponent _basicView;
   late SpriteComponent _menuBar;
   late TextComponent _titleText;
-  late MachineControllerButton _switchButton;
-  late MachineControllerButton _aboutButton;
+  late IconButton _switchButton;
+  late IconButton _aboutButton;
 
   final MoveToEffect _showExtraMenuEffect = MoveToEffect(Vector2(0,0), EffectController(duration: 0.2),);
   final MoveToEffect _closeExtraMenuEffect = MoveToEffect(Vector2(-350,0), EffectController(duration: 0.2),);
@@ -90,7 +90,7 @@ class MachineExtraMenu extends PositionComponent  with HasVisibility{
     double buttonHeight = 78.4;
     double positonX = 190;
     double positonY = localCenter.y-buttonHeight/2;
-    _switchButton = MachineControllerButton(
+    _switchButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: _offIconPath,
@@ -113,7 +113,7 @@ class MachineExtraMenu extends PositionComponent  with HasVisibility{
     double buttonHeight = 100;
     double positonX = 390;
     double positonY = localCenter.y-buttonHeight/2;
-    _aboutButton = MachineControllerButton(
+    _aboutButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_extra_about.png',

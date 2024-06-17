@@ -7,12 +7,11 @@ import 'package:flame/flame.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/particles.dart';
 import 'package:flame/text.dart';
-import 'package:fortune_gems/test_particle_component.dart';
-import 'package:fortune_gems/widget/machine_cntroller_button.dart';
+import 'package:fortune_gems/widget/icon_button.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/widget/machine_extra_menu.dart';
-import 'package:fortune_gems/widget/machine_bet_menu.dart';
-import 'package:fortune_gems/widget/machine_setting_menu.dart';
+import 'package:fortune_gems/components/extra_menu_component.dart';
+import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
+import 'package:fortune_gems/components/setting_menu_component.dart';
 
 class MachineControllerComponent extends PositionComponent {
   MachineControllerComponent({
@@ -38,7 +37,8 @@ class MachineControllerComponent extends PositionComponent {
 
   double _balanceAmount = 2000;
   double _winAmount = 0.00;
-  double _betAmount = 1000;
+  GridItems _currentBetGridItems = GridItems.item15;
+  double _betAmount = double.parse(GridItems.item15.text);
 
 
   late TextComponent _balanceTitleText;
@@ -47,21 +47,20 @@ class MachineControllerComponent extends PositionComponent {
   late TextComponent _winAmountText;
   late TextComponent _betTitleText;
   late TextComponent _betAmountText;
-  late MachineControllerButton _extraButton;
-  late MachineControllerButton _spinButton;
-  late MachineControllerButton _speedButton;
-  late MachineControllerButton _autoButton;
-  late MachineControllerButton _betButton;
-  late MachineControllerButton _settingButton;
-  late MachineExtraMenu _extraMenu;
-  late MachineBetMenu _betMenu;
-  late MachineSettingMenu _settingMenu;
+  late IconButton _extraButton;
+  late IconButton _spinButton;
+  late IconButton _speedButton;
+  late IconButton _autoButton;
+  late IconButton _betButton;
+  late IconButton _settingButton;
+  late ExtraMenuComponent _extraMenu;
+  late GridTextMenuComponent _betMenu;
+  late SettingMenuComponent _settingMenu;
 
 
   bool _isShowSettingMenu = false;
   bool _isShowBetMenu = false;
   bool _isShowExtraMenu = false;
-
 
 
   void showBetMenu(){
@@ -126,12 +125,11 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 132;
     double positonX = 0;
     double positonY = localCenter.y-buttonHeight;
-    _extraButton = MachineControllerButton(
+    _extraButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_extra.png',
       onTap: () {
-
         if(_isShowExtraMenu){
           _isShowExtraMenu = false;
           _extraMenu.closeExtraMenu();
@@ -150,7 +148,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 296;
     double positonX = localCenter.x-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
-    _spinButton = MachineControllerButton(
+    _spinButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_spin.png',
@@ -164,7 +162,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 120;
     double positonX = localCenter.x *1.4-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
-    _autoButton = MachineControllerButton(
+    _autoButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_auto.png',
@@ -180,7 +178,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 120;
     double positonX = localCenter.x *1.65-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
-    _speedButton = MachineControllerButton(
+    _speedButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_speed_disable.png',
@@ -194,7 +192,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 120;
     double positonX = localCenter.x *0.6-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
-    _betButton = MachineControllerButton(
+    _betButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_bet.png',
@@ -219,7 +217,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 120;
     double positonX = localCenter.x *0.2-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
-    _settingButton = MachineControllerButton(
+    _settingButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_setting.png',
@@ -358,7 +356,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 100;
     double positonX = _extraButton.size.x*0.7;
     double positonY = localCenter.y-buttonHeight;
-    _extraMenu = MachineExtraMenu(
+    _extraMenu = ExtraMenuComponent(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX,positonY),
       onTap: () {},
@@ -371,7 +369,7 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 404;
     double positonX = _settingButton.position.x + _settingButton.size.x/2 - buttonWidth/2;
     double positonY = _settingButton.y - buttonHeight -30;
-    _settingMenu = MachineSettingMenu(
+    _settingMenu = SettingMenuComponent(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       onTap: () {},
@@ -385,12 +383,14 @@ class MachineControllerComponent extends PositionComponent {
     double buttonHeight = 595;
     double positonX = _betButton.position.x + _betButton.size.x/2 - buttonWidth/2;
     double positonY = _betButton.y - buttonHeight - 30;
-    _betMenu = MachineBetMenu(
+    _betMenu = GridTextMenuComponent(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      onSelectCallBack: (amount) {
-        _betAmount = amount;
-        _betAmountText.text = amount.toString();
+      defaultGridItems: _currentBetGridItems,
+      onSelectCallBack: (gridItems) {
+        _currentBetGridItems = gridItems;
+        _betAmount = double.parse(gridItems.text);
+        _betAmountText.text = gridItems.text;
       },
     );
     // _betMenu.isVisible = _isShowBetMenu;

@@ -6,6 +6,7 @@ import 'package:flame/particles.dart';
 import 'package:fortune_gems/components/header_component.dart';
 import 'package:fortune_gems/components/machine_component.dart';
 import 'package:fortune_gems/components/machine_controller_component.dart';
+import 'package:fortune_gems/components/score_board_component.dart';
 import 'package:fortune_gems/components/wheel_component.dart';
 import 'package:fortune_gems/components/winning_component.dart';
 import 'package:fortune_gems/system/global.dart';
@@ -23,10 +24,11 @@ class GameMain extends FlameGame{
   late MachineControllerComponent _machineControllerComponent;
   late WinningComponent _winningComponent;
 
+
   GameMain() : super(camera: CameraComponent.withFixedResolution(width: 1290, height:2796)) {
     // pauseWhenBackgrounded = false;
     // debugMode = true;
-  //
+
   }
 
 

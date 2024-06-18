@@ -68,7 +68,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _thirdMachineRollerComponent.showWinningSymbol();
     _specialMachineRollerComponent.showWinningSymbol();
 
-    add(_scoreBoardComponent);
+    _showScoreBoardComponent();
     await Future.delayed(const Duration(seconds: 3));
     remove(_scoreBoardComponent);
     onCallBack.call();
@@ -95,7 +95,6 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     add(_machineFrame);
     _intiMachineRollerComponent();
     _initMachineBanner();
-    _initScoreBoardComponent();
     super.onLoad();
   }
 
@@ -122,10 +121,13 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     add(_machineBanner);
   }
 
-  void _initScoreBoardComponent(){
-    _scoreBoardComponent = ScoreBoardComponent();
+  void _showScoreBoardComponent(){
+    _scoreBoardComponent = ScoreBoardComponent(type: ScoreBoardType.common);
+    double positionX = 0;
+    double positionY = localCenter.y/3 - _scoreBoardComponent.size.y/2;
+    _scoreBoardComponent.position = Vector2(positionX,positionY);
     _scoreBoardComponent.priority = 3;
-    // add(_scoreBoardComponent);
+    add(_scoreBoardComponent);
   }
 
   @override

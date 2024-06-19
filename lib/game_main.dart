@@ -7,7 +7,7 @@ import 'package:fortune_gems/components/header_component.dart';
 import 'package:fortune_gems/components/machine_component.dart';
 import 'package:fortune_gems/components/machine_controller_component.dart';
 import 'package:fortune_gems/components/score_board_component.dart';
-import 'package:fortune_gems/components/wheel_component.dart';
+import 'package:fortune_gems/components/wheel/wheel_component.dart';
 import 'package:fortune_gems/components/winning_component.dart';
 import 'package:fortune_gems/system/global.dart';
 
@@ -102,7 +102,9 @@ class GameMain extends FlameGame{
       },
       onTapAutoButton: (){},
       onTapSpeedButton: (){},
-      onTapBetButton: (){},
+      onTapBetButton: (bet){
+        _wheelComponent.updateBetNumber(bet);
+      },
       onTapSettingButton: (){},
     );
     _machineControllerComponent.priority = 3;

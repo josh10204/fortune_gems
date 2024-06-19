@@ -1,11 +1,11 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import 'package:fortune_gems/components/wheel/wheel_item.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
-import 'package:fortune_gems/model/wheel_item_model.dart';
-
 
 enum WheelRotateStatus {
   starting,
@@ -16,7 +16,6 @@ enum WheelRotateStatus {
   stopped,
 
 }
-
 class WheelComponent extends PositionComponent {
   WheelComponent({super.position,super.anchor ,required this.onCallBack}) : super(size: Vector2(1290, 2796));
   final void Function() onCallBack;
@@ -24,12 +23,14 @@ class WheelComponent extends PositionComponent {
 
   WheelRotateStatus _rotateStatus = WheelRotateStatus.starting;
   late RectangleComponent _backgroundComponent;
+  late PositionComponent _basicWheel;
   late SpriteComponent _wheel;
   late SpriteComponent _wheelFrame;
   late SpriteComponent _wheelSelectFrame;
-  List<WheelItemModel> _wheelItemList = [];
+  // final List<WheelItemType> _wheelItemList = WheelItemType.values;
+  List<WheelItem> _wheelItemList = [];
 
-  static const double _rotationLowSpeedAngle = 1 * 3.14 / 180;
+  static const double _rotationLowSpeedAngle = 0.3 * 3.14 / 180;
   static const double _rotationHighSpeedAngle = 45 * 3.14 / 180;
   double _currentRollingSpeedAngle = _rotationHighSpeedAngle;
 
@@ -37,9 +38,9 @@ class WheelComponent extends PositionComponent {
   double _bounceRangeStartAngle = 0;
   double _bounceRangeEndAngle = 0;
 
-  late WheelItemModel _stopWheelItemModel;
+  late WheelItemType _stopWheelItemModel;
+
   /// 測試暫時數據
-  static const int _wheelItemTotal = 12;//轉盤格數
   static const int _stopItemSerial = 2;//停止轉盤格子編號
 
   Timer _waitUpdateTimer = Timer(1);
@@ -51,9 +52,8 @@ class WheelComponent extends PositionComponent {
       },
       onZoomInComplete: () async {
         _showBackgroundComponent();
-        // add(RectangleComponent(priority:0,size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5)));
         /// 測試暫時數據
-        _stopWheelItemModel = _wheelItemList[_stopItemSerial];
+        _stopWheelItemModel =  WheelItemType.values[_stopItemSerial];
         _bounceRangeStartAngle = _stopWheelItemModel.startAngle;
         _bounceRangeEndAngle = _stopWheelItemModel.endAngle;
         await Future.delayed(const Duration(milliseconds: 500));
@@ -69,74 +69,35 @@ class WheelComponent extends PositionComponent {
 
   }
 
-  void _zoomEffect({required Function() onZoomOutComplete,required Function() onZoomInComplete}){
-    ScaleEffect scaleDownEffect = ScaleEffect.to(
-        Vector2(0,0),
-        EffectController(duration:0.4,curve: Curves.easeInOut),
-        onComplete: (){
-          onZoomOutComplete.call();
-        }
-    );
-    ScaleEffect scaleUpEffect = ScaleEffect.to(
-        Vector2(1,1),
-        EffectController(duration:0.1,curve: Curves.easeInOut,),
-      onComplete: (){
-        onZoomInComplete.call();
-      }
-    );
-
-    SequenceEffect effectSequence = SequenceEffect([
-      scaleDownEffect,
-      scaleUpEffect
-    ]);
-    add(effectSequence);
-  }
-
-
-  void _showBackgroundComponent() {
-    _backgroundComponent = RectangleComponent(size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5),);
-    add(_backgroundComponent);
-  }
-  void _hideBackgroundComponent() {
-    remove(_backgroundComponent);
+  void updateBetNumber(double number){
+    for(WheelItem item in _wheelItemList){
+      item.updateBetNumber(number);
+    }
   }
 
   @override
   Future<void> onLoad() async {
-    _loadWheelItemList();
+    _initBasicWheel();
     await _initWheel();
     await _initWheelFrame();
     await _initWheelSelectFrame();
-    // _initWheelItem();
+    _initWheelItem();
     super.onLoad();
   }
 
-  void _loadWheelItemList(){
-    //每個item 佔據的角度
-    double itemAngle = 360/_wheelItemTotal;
-    double spacingAngle = itemAngle/2 * 3.14 / 180;
-
-    for(int i = 0 ;i <_wheelItemTotal;i++){
-      double centerAngle = itemAngle * i * 3.14 / 180;
-      double startAngle  = centerAngle - spacingAngle;
-      double endAngle = centerAngle + spacingAngle;
-      WheelItemModel model = WheelItemModel(serial:i,startAngle: startAngle,endAngle:endAngle,centerAngle:centerAngle);
-      _wheelItemList.add(model);
-    }
-  }
-  void initBasicComponent(){
-    // _basicComponent = RectangleComponent(size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5),);
-    // add();
+  void _initBasicWheel(){
+    _basicWheel = PositionComponent(size:Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 1);
+    add(_basicWheel);
   }
 
   Future<void> _initWheel() async {
-    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 1);
-    add(_wheel);
+    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1020,1020),priority: 1);
+    _basicWheel.add(_wheel);
   }
 
   Future<void> _initWheelFrame() async {
-    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 2);
-    add(_wheelFrame);
+    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1020,1020),priority: 1);
+    _basicWheel.add(_wheelFrame);
   }
 
   Future<void> _initWheelSelectFrame() async {
@@ -144,6 +105,22 @@ class WheelComponent extends PositionComponent {
     add(_wheelSelectFrame);
   }
 
+
+  void _initWheelItem(){
+
+    for(WheelItemType itemType in WheelItemType.values){
+      WheelItem item = WheelItem(type: itemType,betNumber: 1 );
+      double theta = itemType.numberPositionAngle; // 將角度轉為弧度
+      double radius = min(_wheel.localCenter.x, _wheel.localCenter.y);
+      double positionX = _wheel.localCenter.x + radius * 0.7 * cos(theta); // 調整0.7以確保數字在扇區內
+      double positionY = _wheel.localCenter.y + radius * 0.7 * sin(theta);
+      item.position = Vector2(positionX,positionY);
+      item.angle = itemType.numberAngle;
+      item.priority = 2;
+      _wheelItemList.add(item);
+      _basicWheel.add(item);
+    }
+  }
 
   @override
   void update(double dt) {
@@ -181,19 +158,17 @@ class WheelComponent extends PositionComponent {
   }
 
   void _rotationOffsetAngle({required double angle}){
-    if(_wheel.angle >=360 * 3.14 / 180){
-      _wheel.angle = 0;
-      _wheelFrame.angle = 0;
+    if(_basicWheel.angle >=360 * 3.14 / 180){
+      _basicWheel.angle = 0;
     }else{
-      _wheel.angle += angle;
-      _wheelFrame.angle += angle;
+      _basicWheel.angle += angle;
     }
   }
 
   void _decelerateOffsetAngle({required double angle}){
-    if(_wheel.angle >= _bounceRangeStartAngle && _wheel.angle <= _bounceRangeEndAngle){
+    if(_basicWheel.angle >= _bounceRangeStartAngle && _basicWheel.angle <= _bounceRangeEndAngle){
       _rotateStatus  =  WheelRotateStatus.bounce;
-      if(_wheel.angle >=_bounceRangeEndAngle){
+      if(_basicWheel.angle >=_bounceRangeEndAngle){
         _isBounceForward = false;
       }else{
         _isBounceForward = true;
@@ -203,7 +178,7 @@ class WheelComponent extends PositionComponent {
     }
   }
   void _bounceForwardOffsetAngle({required double angle}){
-    if(_wheel.angle >= _bounceRangeEndAngle){
+    if(_basicWheel.angle >= _bounceRangeEndAngle){
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = false;
@@ -212,14 +187,13 @@ class WheelComponent extends PositionComponent {
         _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
-      _wheel.angle += angle;
-      _wheelFrame.angle += angle;
+      _basicWheel.angle += angle;
 
     }
   }
 
   void _bounceBackOffsetAngle({required double angle}){
-    if(_wheel.angle <= _bounceRangeStartAngle){
+    if(_basicWheel.angle <= _bounceRangeStartAngle){
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = true;
@@ -228,15 +202,14 @@ class WheelComponent extends PositionComponent {
         _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
-      _wheel.angle -= angle;
-      _wheelFrame.angle -= angle;
+      _basicWheel.angle -= angle;
 
     }
 
   }
 
   Future<void> _stoppingOffsetAngle({required double dt})  async {
-    _wheel.angle = _stopWheelItemModel.centerAngle;
+    _basicWheel.angle = _stopWheelItemModel.centerAngle;
     _waitUpdateTimer.update(dt);
     if (_waitUpdateTimer.finished) {
       _rotateStatus  =  WheelRotateStatus.stopped;
@@ -259,5 +232,37 @@ class WheelComponent extends PositionComponent {
     );
     // _hideBackgroundComponent();
 
+  }
+
+
+  void _zoomEffect({required Function() onZoomOutComplete,required Function() onZoomInComplete}){
+    ScaleEffect scaleDownEffect = ScaleEffect.to(
+        Vector2(0,0),
+        EffectController(duration:0.4,curve: Curves.easeInOut),
+        onComplete: (){
+          onZoomOutComplete.call();
+        }
+    );
+    ScaleEffect scaleUpEffect = ScaleEffect.to(
+        Vector2(1,1),
+        EffectController(duration:0.1,curve: Curves.easeInOut,),
+        onComplete: (){
+          onZoomInComplete.call();
+        }
+    );
+
+    SequenceEffect effectSequence = SequenceEffect([
+      scaleDownEffect,
+      scaleUpEffect
+    ]);
+    add(effectSequence);
+  }
+
+  void _showBackgroundComponent() {
+    _backgroundComponent = RectangleComponent(size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5),);
+    add(_backgroundComponent);
+  }
+  void _hideBackgroundComponent() {
+    remove(_backgroundComponent);
   }
 }

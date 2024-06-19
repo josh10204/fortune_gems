@@ -26,7 +26,7 @@ class MachineControllerComponent extends PositionComponent {
   final void Function() onTapSpinButton;
   final void Function() onTapAutoButton;
   final void Function() onTapSpeedButton;
-  final void Function() onTapBetButton;
+  final void Function(double bet) onTapBetButton;
   final void Function() onTapSettingButton;
 
 
@@ -197,7 +197,6 @@ class MachineControllerComponent extends PositionComponent {
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_bet.png',
       onTap: () {
-
         if(_isShowBetMenu){
           hideBetMenu();
         }else{
@@ -206,7 +205,6 @@ class MachineControllerComponent extends PositionComponent {
         if(_isShowSettingMenu){
           hideSettingMenu();
         }
-        onTapBetButton.call();
       },
     );
     add(_betButton);
@@ -391,6 +389,7 @@ class MachineControllerComponent extends PositionComponent {
         _currentBetGridItems = gridItems;
         _betAmount = double.parse(gridItems.text);
         _betAmountText.text = gridItems.text;
+        onTapBetButton.call(_betAmount);
       },
     );
     // _betMenu.isVisible = _isShowBetMenu;

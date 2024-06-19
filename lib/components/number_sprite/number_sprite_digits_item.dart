@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 
-class NumberSpriteDigitsItem extends PositionComponent {
+class NumberSpriteDigitsItem extends SpriteComponent {
   NumberSpriteDigitsItem({super.position,super.size,required this.numberType}) : super();
 
   NumberType numberType;
@@ -16,11 +16,15 @@ class NumberSpriteDigitsItem extends PositionComponent {
     double height = numberType.height;
     double positionY = position.y;
     double positionX = 0;
-    add(SpriteComponent(
-      sprite: await Sprite.load(numberType.imagePath),
-      size: Vector2(width, height),
-      position: Vector2(positionX, positionY),
-    ));
+    // add(SpriteComponent(
+    //   sprite: await Sprite.load(numberType.imagePath),
+    //   size: Vector2(width, height),
+    //   position: Vector2(positionX, positionY),
+    // ));
+
+    sprite = await Sprite.load(numberType.imagePath);
+    // size = Vector2(width, height);
+    // position = Vector2(positionX, positionY);
   }
 
   @override

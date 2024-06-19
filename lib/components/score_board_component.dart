@@ -113,7 +113,7 @@ class ScoreBoardComponent extends PositionComponent {
 
     double positionX = _commonContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - _contentSize.y/2;
-    _numberSpriteComponent = NumberSpriteComponent(number:0,size:_contentSize);
+    _numberSpriteComponent = NumberSpriteComponent(number:0,size:_contentSize,fontScale: 1);
     _numberSpriteComponent.position = Vector2(positionX,positionY);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
@@ -123,7 +123,7 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _numberSpriteComponent = NumberSpriteComponent(number:1,size: Vector2(width,height));
+    _numberSpriteComponent = NumberSpriteComponent(number:1025,size: Vector2(width,height),fontScale: 1);
     _numberSpriteComponent.position = Vector2(positionX,positionY);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
@@ -133,7 +133,7 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = width + _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _additionNumberSpriteComponent = NumberSpriteComponent(number:1,size: Vector2(width,height));
+    _additionNumberSpriteComponent = NumberSpriteComponent(number:1,size: Vector2(width,height),fontScale: 1);
     _additionNumberSpriteComponent.position = Vector2(positionX,positionY);
     _frameSpriteComponent.add(_additionNumberSpriteComponent);
   }

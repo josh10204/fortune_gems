@@ -94,7 +94,7 @@ class ScoreBoardComponent extends PositionComponent {
     _plusSpriteComponent = SpriteComponent();
     _plusSpriteComponent.size =  Vector2(width,height);
     _plusSpriteComponent.position =  Vector2(positionX, positionY);
-    _plusSpriteComponent.sprite =  await Sprite.load('icons/numbers_plus.png');
+    _plusSpriteComponent.sprite =  await Sprite.load('icons/numbers/numbers_plus.png');
     _plusSpriteComponent.priority = 1;
     _frameSpriteComponent.add(_plusSpriteComponent);
   }
@@ -110,11 +110,9 @@ class ScoreBoardComponent extends PositionComponent {
 
 
   void _initCommonNumberSpriteComponent(){
-
     double positionX = _commonContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - _contentSize.y/2;
-    _numberSpriteComponent = NumberSpriteComponent(number:0,size:_contentSize,fontScale: 1);
-    _numberSpriteComponent.position = Vector2(positionX,positionY);
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size:_contentSize,number:200.02,fontScale: 1);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
 
@@ -123,8 +121,7 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _numberSpriteComponent = NumberSpriteComponent(number:1025,size: Vector2(width,height),fontScale: 1);
-    _numberSpriteComponent.position = Vector2(positionX,positionY);
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:1025,fontScale: 1);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
 
@@ -133,8 +130,8 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = width + _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _additionNumberSpriteComponent = NumberSpriteComponent(number:1,size: Vector2(width,height),fontScale: 1);
-    _additionNumberSpriteComponent.position = Vector2(positionX,positionY);
+    _additionNumberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:1,fontScale: 1);
+    // _additionNumberSpriteComponent.position = Vector2(positionX,positionY);
     _frameSpriteComponent.add(_additionNumberSpriteComponent);
   }
 

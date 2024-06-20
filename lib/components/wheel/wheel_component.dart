@@ -27,6 +27,7 @@ class WheelComponent extends PositionComponent {
   late SpriteComponent _wheel;
   late SpriteComponent _wheelFrame;
   late SpriteComponent _wheelSelectFrame;
+  late SpriteComponent _wheelCenterLogo;
   // final List<WheelItemType> _wheelItemList = WheelItemType.values;
   List<WheelItem> _wheelItemList = [];
 
@@ -81,6 +82,7 @@ class WheelComponent extends PositionComponent {
     await _initWheel();
     await _initWheelFrame();
     await _initWheelSelectFrame();
+    await _initWheelCenterLogo();
     _initWheelItem();
     super.onLoad();
   }
@@ -103,6 +105,11 @@ class WheelComponent extends PositionComponent {
   Future<void> _initWheelSelectFrame() async {
     _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(382.5,685),position: Vector2(localCenter.x,localCenter.y-245),anchor: Anchor.center,priority: 3);
     add(_wheelSelectFrame);
+  }
+
+  Future<void> _initWheelCenterLogo() async {
+    _wheelCenterLogo  = SpriteComponent(sprite: await Sprite.load('images/wheel_center_logo.png'),size: Vector2(248,248),position: localCenter,anchor: Anchor.center,priority: 4);
+    add(_wheelCenterLogo);
   }
 
 

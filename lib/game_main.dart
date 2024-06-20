@@ -59,6 +59,7 @@ class GameMain extends FlameGame{
     _initWheelComponent();
     _initMachineComponent();
     _intiMachineControllerComponent();
+    _showWinningEffectComponent();
   }
 
   void _initHeaderComponents(){

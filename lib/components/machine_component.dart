@@ -122,7 +122,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   }
 
   void _showScoreBoardComponent(){
-    _scoreBoardComponent = ScoreBoardComponent(type: ScoreBoardType.wheel);
+    _scoreBoardComponent = ScoreBoardComponent(type: ScoreBoardType.common);
     double positionX = 0;
     double positionY = localCenter.y/3 - _scoreBoardComponent.size.y/2;
     _scoreBoardComponent.position = Vector2(positionX,positionY);

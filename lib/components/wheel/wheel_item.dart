@@ -11,7 +11,7 @@ class WheelItem extends PositionComponent {
 
   void updateBetNumber(double number){
     remove( _numberSpriteComponent);
-    _numberSpriteComponent = NumberSpriteComponent(number:number*type.multiple,size: Vector2(width,height),fontScale: 0.75);
+    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),size: Vector2(width,height),number:number*type.multiple,fontScale: 0.75);
     add(_numberSpriteComponent);
   }
   @override
@@ -21,10 +21,8 @@ class WheelItem extends PositionComponent {
   }
 
   void _initNumberSpriteComponent(){
-
-    _numberSpriteComponent = NumberSpriteComponent(number:betNumber*type.multiple,size: Vector2(width,height),fontScale: 0.75);
+    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),number:betNumber*type.multiple,size: Vector2(width,height),fontScale: 0.75);
     add(_numberSpriteComponent);
-
   }
 }
 

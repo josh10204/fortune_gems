@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
+import 'package:fortune_gems/components/number_sprite/number_sprite_component.dart';
+import 'package:fortune_gems/components/number_sprite/sprite_number_component.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/test_particle_component.dart';
 
@@ -25,6 +27,8 @@ class WinningComponent extends PositionComponent {
   late SpriteComponent _leftBirdSpriteComponent;
   late SpriteComponent _rightBirdSpriteComponent;
   late RectangleComponent _amountBasicComponent;
+  late NumberSpriteComponent _numberSpriteComponent;
+  late SpriteNumberComponent _spriteNumberComponent;
 
   WinningType _currentWinningType = WinningType.bigWin;
 
@@ -78,6 +82,7 @@ class WinningComponent extends PositionComponent {
     _initRightBirdSpriteComponent();
     _initAmountBasicComponent();
     _showCoinParticleComponent();
+    _initSpriteNumberComponent();
 
   }
   void _initBackgroundComponent() {
@@ -176,6 +181,30 @@ class WinningComponent extends PositionComponent {
       priority: 1,
     );
     add(_amountBasicComponent);
+  }
+
+  Future<void> _initSpriteNumberComponent() async {
+
+    // double width = 1200;
+    // double height = 150;
+    // double positionX = _amountBasicComponent.localCenter.x - width/2;
+    // double positionY = _amountBasicComponent.localCenter.y - height/2;
+    // _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY), size: Vector2(width,height),number: 12000,fontScale: 1);
+    // _amountBasicComponent.add(_numberSpriteComponent);
+
+
+    double positionY = localCenter.y;
+    _spriteNumberComponent =SpriteNumberComponent(
+      srcDirPath: 'icons/numbers/',
+      anchor: Anchor.center,
+      position: _amountBasicComponent.localCenter,
+      initNum: 0
+    );
+    _spriteNumberComponent.priority = 3;
+    _amountBasicComponent.add(_spriteNumberComponent);
+
+    await Future.delayed(const Duration(milliseconds: 1000));
+    _spriteNumberComponent.tickTo(678905432);
   }
 
   void _showCoinParticleComponent(){

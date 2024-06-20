@@ -119,7 +119,7 @@ class WheelComponent extends PositionComponent {
   void _initWheelItem(){
 
     for(WheelItemType itemType in WheelItemType.values){
-      WheelItem item = WheelItem(type: itemType,betNumber: 10 ,basicCenter: _basicWheel.localCenter);
+      WheelItem item = WheelItem(type: itemType,betNumber: 1 ,basicCenter: _basicWheel.localCenter);
       item.priority = 2;
       _wheelItemList.add(item);
       _basicWheel.add(item);

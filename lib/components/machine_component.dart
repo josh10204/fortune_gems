@@ -36,6 +36,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   void startRollingMachine(){
     if(_global.gameStatus == GameStatus.idle){
       _startRolling();
+
     }
   }
 

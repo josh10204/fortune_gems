@@ -93,9 +93,5 @@ enum GridItems{
   final String text;
   final double positionX;
   final double positionY;
-
-
   const GridItems({required this.serial, required this.text, required this.positionX,required this.positionY});
-
-
 }

@@ -7,6 +7,7 @@ import 'package:flame/flame.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/particles.dart';
 import 'package:flame/text.dart';
+import 'package:fortune_gems/system/global.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/components/extra_menu_component.dart';
@@ -35,6 +36,7 @@ class MachineControllerComponent extends PositionComponent {
   final Color _textTitleColor = const Color.fromRGBO(248, 215, 97, 1);
   final Color _textSubTitleColor = const Color.fromRGBO(255, 255, 255, 1);
 
+  late Global _global;
   double _balanceAmount = 2000;
   double _winAmount = 0.00;
   GridItems _currentBetGridItems = GridItems.item15;
@@ -63,22 +65,28 @@ class MachineControllerComponent extends PositionComponent {
   bool _isShowExtraMenu = false;
 
 
+
   void showBetMenu(){
+    if(_global.gameStatus != GameStatus.idle) return;
     _isShowBetMenu = true;
     _initBetMenu();
   }
 
   void hideBetMenu(){
+    if(_isShowBetMenu == false) return;
     _isShowBetMenu = false;
     remove(_betMenu);
   }
 
   void showSettingMenu(){
+    if(_global.gameStatus != GameStatus.idle) return;
     _isShowSettingMenu = true;
     _initSettingMenu();
   }
 
   void hideSettingMenu(){
+    if(_isShowSettingMenu == false) return;
+
     _isShowSettingMenu = false;
     remove(_settingMenu);
   }
@@ -87,7 +95,7 @@ class MachineControllerComponent extends PositionComponent {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
+    _global = Global();
     await _initBottomBackground();
     _initExtraButton();
     _initSpinButton();
@@ -152,7 +160,11 @@ class MachineControllerComponent extends PositionComponent {
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
       iconPath: 'icons/button_spin.png',
-      onTap: () => onTapSpinButton.call(),
+      onTap: () {
+        hideSettingMenu();
+        hideBetMenu();
+        onTapSpinButton.call();
+      }
     );
     add(_spinButton);
   }

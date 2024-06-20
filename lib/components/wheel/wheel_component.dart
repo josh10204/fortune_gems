@@ -8,13 +8,14 @@ import 'package:fortune_gems/components/wheel/wheel_item.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 
 enum WheelRotateStatus {
+  opening,
   starting,
   speedUp,
   decelerating,
   bounce,
   stopping,
   stopped,
-
+  still,
 }
 class WheelComponent extends PositionComponent {
   WheelComponent({super.position,super.anchor ,required this.onCallBack}) : super(size: Vector2(1290, 2796));
@@ -47,12 +48,14 @@ class WheelComponent extends PositionComponent {
   Timer _waitUpdateTimer = Timer(1);
 
   Future<void> startLottery() async {
+    _rotateStatus = WheelRotateStatus.opening;
     _zoomEffect(
-      onZoomOutComplete: () {
+      onFadeOutComplete: () {
         priority = 4;
       },
-      onZoomInComplete: () async {
+      onFadeInComplete: () async {
         _showBackgroundComponent();
+        _rotateStatus = WheelRotateStatus.starting;
         /// 測試暫時數據
         _stopWheelItemModel =  WheelItemType.values[_stopItemSerial];
         _bounceRangeStartAngle = _stopWheelItemModel.startAngle;
@@ -116,13 +119,7 @@ class WheelComponent extends PositionComponent {
   void _initWheelItem(){
 
     for(WheelItemType itemType in WheelItemType.values){
-      WheelItem item = WheelItem(type: itemType,betNumber: 1 );
-      double theta = itemType.numberPositionAngle; // 將角度轉為弧度
-      double radius = min(_wheel.localCenter.x, _wheel.localCenter.y);
-      double positionX = _wheel.localCenter.x + radius * 0.7 * cos(theta); // 調整0.7以確保數字在扇區內
-      double positionY = _wheel.localCenter.y + radius * 0.7 * sin(theta);
-      item.position = Vector2(positionX,positionY);
-      item.angle = itemType.numberAngle;
+      WheelItem item = WheelItem(type: itemType,betNumber: 10 ,basicCenter: _basicWheel.localCenter);
       item.priority = 2;
       _wheelItemList.add(item);
       _basicWheel.add(item);
@@ -133,6 +130,10 @@ class WheelComponent extends PositionComponent {
   void update(double dt) {
     super.update(dt);
     switch(_rotateStatus){
+      case WheelRotateStatus.opening:
+        _basicWheel.angle = 0;
+        _rotateStatus = WheelRotateStatus.still;
+        break;
       case WheelRotateStatus.starting:
         _rotationOffsetAngle(angle: _rotationLowSpeedAngle);
         break;
@@ -160,6 +161,8 @@ class WheelComponent extends PositionComponent {
         break;
       case WheelRotateStatus.stopped:
         _stopped();
+        break;
+      case WheelRotateStatus.still:
         break;
     }
   }
@@ -230,10 +233,10 @@ class WheelComponent extends PositionComponent {
     _isBounceForward = true;
     _hideBackgroundComponent();
     _zoomEffect(
-      onZoomOutComplete: () {
+      onFadeOutComplete: () {
         priority = 1;
       },
-      onZoomInComplete: () {
+      onFadeInComplete: () {
         onCallBack.call();
       },
     );
@@ -242,25 +245,54 @@ class WheelComponent extends PositionComponent {
   }
 
 
-  void _zoomEffect({required Function() onZoomOutComplete,required Function() onZoomInComplete}){
+  Future<void> _zoomEffect({required Function() onFadeOutComplete,required Function() onFadeInComplete}) async {
+
+    _fadeOutEffect(oComplete: onFadeOutComplete);
+    await Future.delayed(const Duration(milliseconds: 400));
+    _fadeInEffect(oComplete: onFadeInComplete);
+
+  }
+  Future<void> _fadeOutEffect({required Function() oComplete}) async {
+    for(WheelItem item in _wheelItemList){
+      item.closeEffect();
+    }
     ScaleEffect scaleDownEffect = ScaleEffect.to(
         Vector2(0,0),
         EffectController(duration:0.4,curve: Curves.easeInOut),
         onComplete: (){
-          onZoomOutComplete.call();
+          oComplete.call();
         }
     );
+    add(scaleDownEffect);
+  }
+
+  Future<void> _fadeInEffect({required Function() oComplete}) async {
+    for(WheelItem item in _wheelItemList){
+      item.openEffect();
+    }
+    RotateEffect rotateEffect = RotateEffect.to(
+      180 * 3.14 / 180,
+      EffectController(duration: 0.8),
+    );
+    _basicWheel.add(rotateEffect);
+
     ScaleEffect scaleUpEffect = ScaleEffect.to(
-        Vector2(1,1),
-        EffectController(duration:0.1,curve: Curves.easeInOut,),
+        Vector2(1.5,1.5),
+        EffectController(duration:0.5,curve: Curves.easeInOut,),
         onComplete: (){
-          onZoomInComplete.call();
         }
     );
 
+    ScaleEffect scaleBackEffect = ScaleEffect.to(
+        Vector2(1,1),
+        EffectController(duration:0.5,curve: Curves.easeInOut,),
+        onComplete: (){
+          oComplete.call();
+        }
+    );
     SequenceEffect effectSequence = SequenceEffect([
-      scaleDownEffect,
-      scaleUpEffect
+      scaleUpEffect,
+      scaleBackEffect
     ]);
     add(effectSequence);
   }
@@ -272,4 +304,5 @@ class WheelComponent extends PositionComponent {
   void _hideBackgroundComponent() {
     remove(_backgroundComponent);
   }
+
 }

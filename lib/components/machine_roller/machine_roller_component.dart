@@ -2,12 +2,13 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
+import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/components/machine_roller/machine_roller_symbol.dart';
 
 enum RollerType{
   common,
-  special,
+  ratio,
 }
 
 enum RollerStatus {
@@ -35,6 +36,10 @@ class MachineRollerComponent extends PositionComponent {
   RollerStatus _rollerState = RollerStatus.stopped;
   late MachineRollerSymbol firstRollerSymbol;
 
+  final List<String> _blockList = ['W','H1','H2','H3','N1','N2','N3','N4'];
+  final List<String> _ratioList = ['0','1','2','3','5','10','15'];
+
+
   /// 取得目前滾動狀態
   RollerStatus get currentState {
     return _rollerState;
@@ -45,29 +50,44 @@ class MachineRollerComponent extends PositionComponent {
       print('開始');
       _rollerState = RollerStatus.starting;
       for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
-        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.general);
+        // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.general);
       }
+    }
+  }
+
+  /// 更新內容
+  Future<void> updateRollerSymbolList({required List<RollerSymbolModel> modelList}) async {
+    List<RollerSymbolModel> list = modelList;
+    /// 倍率的輪盤，補齊剩餘兩個隨機顯示的內容
+    if(rollerType == RollerType.ratio){
+      list = _getRandomRollerSymbolList(list: _ratioList,total:2);
+      list.insert(1, modelList[0]);
+    }
+    for(int i = 0;i<list.length;i++){
+      MachineRollerSymbol symbol = _slotMachineRollerSymbolList[i];
+      RollerSymbolModel model = list[i];
+      bool isStopHeader = i==0?true:false;
+      symbol.updateRollerSymbol(model: model, isStopHeader: isStopHeader);
     }
   }
 
   /// 停止滾動
   Future<void> stopRolling() async {
     if (_rollerState == RollerStatus.rolling) {
-      print('停止');
-      await _updateRollerSymbolList();
       _rollerState = RollerStatus.decelerating;
     }
   }
 
   void showWinningSymbol(){
-    for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
-      if(symbol.rollerSymbolModel.isWinningSymbol){
-        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.animation);
-      }else{
-        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.mask);
-      }
-    }
+    // for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
+    //   // if(symbol.rollerSymbolModel.isWinningSymbol){
+    //     // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.animation);
+    //   }else{
+    //     // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.mask);
+    //   }
+    // }
   }
+
 
 
 
@@ -75,7 +95,7 @@ class MachineRollerComponent extends PositionComponent {
   void onLoad() async {
     _initRollerSymbolList();
 
-    if(rollerType == RollerType.special){
+    if(rollerType == RollerType.ratio){
       _initSelectFrame();
     }
 
@@ -89,11 +109,17 @@ class MachineRollerComponent extends PositionComponent {
 
   void _initRollerSymbolList(){
     Random random = Random();
-    List<RollerSymbolModel> allSymbol = _getAllRollerSymbol();
+    List<RollerSymbolModel> allSymbol =[];
+    switch(rollerType){
+      case RollerType.common:
+        allSymbol = _getRandomRollerSymbolList(list: _blockList,total:5);
+      case RollerType.ratio:
+        allSymbol = _getRandomRollerSymbolList(list: _ratioList,total:5);
+      default:
+    }
     int symbolTotal = 5;
     for (int i = 0 ;i< symbolTotal;i++) {
       RollerSymbolModel symbol = allSymbol[random.nextInt(allSymbol.length)];
-
       MachineRollerSymbol rollerSymbol = MachineRollerSymbol(rollerSymbolModel: symbol,index:i,position: localCenter,anchor:Anchor.topCenter);
       _slotMachineRollerSymbolList.add(rollerSymbol);
     }
@@ -101,52 +127,20 @@ class MachineRollerComponent extends PositionComponent {
     add(ClipComponent.rectangle(size: size, children: _slotMachineRollerSymbolList));
   }
 
-  Future<void> _updateRollerSymbolList() async {
+
+  List<RollerSymbolModel> _getRandomRollerSymbolList({required List<String> list,required int total}){
+    List<RollerSymbolModel> rollerSymbolList =[];
     Random random = Random();
-    List<RollerSymbolModel> allSymbol = _getAllRollerSymbol();
-    // int randomIndex = random.nextInt(_slotMachineRollerBlock.length);
-    int randomIndex = 1;
-    int randomWinningTotleIndex = 1;
-    int i = 1;
-    for(MachineRollerSymbol rollerSymbol in _slotMachineRollerSymbolList){
-      bool isStopHeader = i == randomIndex? true:false ;
-      bool isWinningTarget = randomWinningTotleIndex == i ? true:false;
-      RollerSymbolModel symbol = allSymbol[random.nextInt(allSymbol.length)];
-      symbol.isWinningSymbol= isWinningTarget;
-      await rollerSymbol.updateRollerSymbol(model:symbol ,isStopHeader:isStopHeader);
-      if(i==3) break;
-      i++;
+    for (int i = 0; i < total; i++) {
+      int randomIndex = random.nextInt(list.length);
+      String symbol = list[randomIndex];
+      RollerSymbolType type = symbol.getRollerSymbolType;
+      RollerSymbolModel model = RollerSymbolModel(type: type);
+      rollerSymbolList.add(model);
     }
-    await Future.delayed(const Duration(milliseconds: 500));
+    return rollerSymbolList;
   }
 
-  List<RollerSymbolModel> _getAllRollerSymbol(){
-    List<RollerSymbolModel> list = [];
-    if(rollerType == RollerType.common){
-      list = [
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_01.png',unselectImageFilePath: 'icons/symbol_common_unselect_01.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_02.png',unselectImageFilePath: 'icons/symbol_common_unselect_02.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_03.png',unselectImageFilePath: 'icons/symbol_common_unselect_03.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_04.png',unselectImageFilePath: 'icons/symbol_common_unselect_04.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_05.png',unselectImageFilePath: 'icons/symbol_common_unselect_05.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_06.png',unselectImageFilePath: 'icons/symbol_common_unselect_06.png'),
-        RollerSymbolModel(type:RollerSymbolType.common,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_07.png',unselectImageFilePath: 'icons/symbol_common_unselect_07.png'),
-        RollerSymbolModel(type:RollerSymbolType.wild,isWinningSymbol:false,imageFilePath: 'icons/symbol_common_08.png',unselectImageFilePath: 'icons/symbol_common_unselect_08.png'),
-      ];
-
-    }else{
-      list = [
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_01.png',unselectImageFilePath: 'icons/symbol_addition_unselect_01.png'),
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_02.png',unselectImageFilePath: 'icons/symbol_addition_unselect_02.png'),
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_03.png',unselectImageFilePath: 'icons/symbol_addition_unselect_03.png'),
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_04.png',unselectImageFilePath: 'icons/symbol_addition_unselect_04.png'),
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_05.png',unselectImageFilePath: 'icons/symbol_addition_unselect_05.png'),
-        RollerSymbolModel(type:RollerSymbolType.addition,isWinningSymbol:false,imageFilePath: 'icons/symbol_addition_06.png',unselectImageFilePath: 'icons/symbol_addition_unselect_06.png'),
-      ];
-    }
-
-    return list;
-  }
 
   @override
   void update(double dt) {
@@ -207,7 +201,7 @@ class MachineRollerComponent extends PositionComponent {
           //移動Ｙ軸為，目前第一個方塊Y軸 減去 方塊高度
           double positionY = firstRollerSymbol.position.y -_symbolHeight;
           //如果目前第一個方塊是特殊類型（老鷹圖案），因為尺寸不同，所以移動Ｙ軸，則需要加上特殊方塊的中心
-          if(firstRollerSymbol.rollerSymbolModel.type == RollerSymbolType.wild) {
+          if(firstRollerSymbol.rollerSymbolModel.type == RollerSymbolType.blockWild) {
             positionY +=firstRollerSymbol.specialSymbolCenterY;
           }
           slotMachineRollerSymbol.updateRollerSymbolPositionY(positionY);

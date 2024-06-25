@@ -35,3 +35,7 @@ flutter:
     - assets/images/animation/coin/
     - assets/images/icons/
     - assets/images/icons/numbers/
+    - assets/images/icons/symbol/
+    - assets/images/icons/symbol/block/
+    - assets/images/icons/symbol/ratio/
+    - assets/images/icons/symbol/wheel/

@@ -36,7 +36,7 @@ class MachineRollerSymbol extends SpriteComponent {
   bool _isAnimation = false;
 
   void updateRollerSymbolPositionY(double positionY){
-    if(rollerSymbolModel.type == RollerSymbolType.wild){
+    if(rollerSymbolModel.type == RollerSymbolType.blockWild){
       priority = 1;
       position.y = positionY - specialSymbolCenterY;
     }else{
@@ -46,7 +46,7 @@ class MachineRollerSymbol extends SpriteComponent {
   }
 
   void stopRollerSymbol(int index){
-    if(rollerSymbolModel.type == RollerSymbolType.wild){
+    if(rollerSymbolModel.type == RollerSymbolType.blockWild){
       size = specialSymbolSize;
       priority = 1;
       double center = specialSymbolSize.y/2 - generalSymbolSize.y/2;
@@ -74,37 +74,38 @@ class MachineRollerSymbol extends SpriteComponent {
   }
 
   Future<void> updateRollerSymbol({required RollerSymbolModel model ,required bool isStopHeader}) async {
-    sprite = await Sprite.load(model.imageFilePath);
+    sprite = await Sprite.load(model.type.imagePath);
     rollerSymbolModel = model;
-    if(rollerSymbolModel.type == RollerSymbolType.wild){
+    _isStopHeader = isStopHeader;
+
+    if(rollerSymbolModel.type == RollerSymbolType.blockWild){
       size = specialSymbolSize;
       priority = 1;
     }else{
       size = generalSymbolSize;
       priority = 0;
     }
-    _isStopHeader = isStopHeader;
   }
 
   bool get isStopHeader{
     return _isStopHeader;
   }
 
-  Future<void> updateRollerSymbolStatus(MachineRollerSymbolStatus status) async {
+  Future<void> _updateRollerSymbolStatus(MachineRollerSymbolStatus status) async {
 
     switch (status ){
       case MachineRollerSymbolStatus.general:
-        sprite = await Sprite.load(rollerSymbolModel.imageFilePath);
+        sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
         _isAnimation = false;
         _scaleEffect.pause();
 
         break;
       case MachineRollerSymbolStatus.mask:
-        sprite = await Sprite.load(rollerSymbolModel.unselectImageFilePath);
+        sprite = await Sprite.load(rollerSymbolModel.type.unselectImagePath);
         _scaleEffect.pause();
         break;
       case MachineRollerSymbolStatus.animation:
-        sprite = await Sprite.load(rollerSymbolModel.imageFilePath);
+        sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
         priority = 2;
         _isAnimation = true;
         _scaleEffect.reset();
@@ -116,8 +117,8 @@ class MachineRollerSymbol extends SpriteComponent {
   @override
   void onLoad() async {
     //Set sprite on load.
-    sprite = await Sprite.load(rollerSymbolModel.imageFilePath);
-    if(rollerSymbolModel.type == RollerSymbolType.wild){
+    sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
+    if(rollerSymbolModel.type == RollerSymbolType.blockWild){
       size = specialSymbolSize;
       // double center = specialSymbolSize.y/2 - generalSymbolSize.y/2;
       priority = 1;

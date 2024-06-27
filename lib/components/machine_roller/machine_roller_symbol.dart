@@ -27,7 +27,7 @@ class MachineRollerSymbol extends SpriteComponent {
   bool _isStopHeader = false;
 
 
-  late ScaleEffect _scaleEffect  ;
+  // late ScaleEffect _scaleEffect  ;
   final Vector2 generalSymbolSize = Vector2(278.4,227.2);
   final Vector2 specialSymbolSize = Vector2(332.8,316.8);
   //特殊方塊的中心位置Y軸
@@ -51,24 +51,13 @@ class MachineRollerSymbol extends SpriteComponent {
       priority = 1;
       double center = specialSymbolSize.y/2 - generalSymbolSize.y/2;
       double positionY = generalSymbolSize.y*index -center;
-      // position = Vector2(baseCenter.x - specialSymbolSize.x/2,positionY);
       position = Vector2(position.x,positionY);
-
-      // double distance = position.y - positionY;
-      // double offset =  distance *0.2;
-      // position = Vector2(baseCenter.x - specialSymbolSize.x/2,position.y - offset);
-
 
     }else{
       size = generalSymbolSize;
       priority = 0;
       double positionY = generalSymbolSize.y * index;
-      // position = Vector2(baseCenter.x - generalSymbolSize.x/2,positionY);
       position = Vector2(position.x,positionY);
-
-      // double distance = position.y - positionY;
-      // double offset =  distance*0.2;
-      // position = Vector2(baseCenter.x - generalSymbolSize.x/2,position.y - offset);
 
     }
   }
@@ -91,24 +80,24 @@ class MachineRollerSymbol extends SpriteComponent {
     return _isStopHeader;
   }
 
-  Future<void> _updateRollerSymbolStatus(MachineRollerSymbolStatus status) async {
+  Future<void> updateRollerSymbolStatus(MachineRollerSymbolStatus status) async {
 
     switch (status ){
       case MachineRollerSymbolStatus.general:
         sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
-        _isAnimation = false;
-        _scaleEffect.pause();
+        // _isAnimation = false;
+        // _scaleEffect.pause();
 
         break;
       case MachineRollerSymbolStatus.mask:
         sprite = await Sprite.load(rollerSymbolModel.type.unselectImagePath);
-        _scaleEffect.pause();
+        // _scaleEffect.pause();
         break;
       case MachineRollerSymbolStatus.animation:
         sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
         priority = 2;
-        _isAnimation = true;
-        _scaleEffect.reset();
+        // _isAnimation = true;
+        // _scaleEffect.reset();
         break;
 
     }
@@ -124,8 +113,6 @@ class MachineRollerSymbol extends SpriteComponent {
       priority = 1;
       // position = Vector2(baseCenter.x - specialSymbolSize.x/2, generalSymbolSize.y*index - specialSymbolCenterY);
       position = Vector2(position.x, generalSymbolSize.y*index - specialSymbolCenterY);
-
-
     }else{
       size = generalSymbolSize;
       priority = 0;
@@ -135,19 +122,19 @@ class MachineRollerSymbol extends SpriteComponent {
     }
 
 
-    _initScaleEffect();
+    // _initScaleEffect();
     super.onLoad();
 
   }
 
-  void _initScaleEffect(){
-    _scaleEffect = ScaleEffect.to(
-      Vector2(1.05,1.05),
-      EffectController(duration: 1, reverseDuration: 1,infinite: true,curve: Curves.easeInOut),
-    );
-    add(_scaleEffect);
-    _scaleEffect.pause();
-  }
+  // void _initScaleEffect(){
+  //   _scaleEffect = ScaleEffect.to(
+  //     Vector2(1.05,1.05),
+  //     EffectController(duration: 1, reverseDuration: 1,infinite: true,curve: Curves.easeInOut),
+  //   );
+  //   add(_scaleEffect);
+  //   _scaleEffect.pause();
+  // }
 
   @override
   void update(double dt) {

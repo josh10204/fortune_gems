@@ -22,18 +22,18 @@ class DemoData{
           "panel": ["W", "W", "W", "H1", "H1", "H1", "H1", "H1", "H1"],
           "result": [
             {
-              "item": "W",
-              "playResult": 500,
-              "line": 2,
-              "linkCount": 3,
-              "odd": 25
-            },
-            {
               "item": "H1",
               "playResult": 400,
               "line": 1,
               "linkCount": 3,
               "odd": 20
+            },
+            {
+              "item": "W",
+              "playResult": 500,
+              "line": 2,
+              "linkCount": 3,
+              "odd": 25
             },
             {
               "item": "H1",

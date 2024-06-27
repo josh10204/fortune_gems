@@ -19,7 +19,6 @@ enum RollerStatus {
   stopping,
   stopped,
 }
-
 class MachineRollerComponent extends PositionComponent {
   MachineRollerComponent({super.position,super.priority,required this.rollerType,required this.onStopCallBack}) : super(size: Vector2(332.8,681.6));
 
@@ -50,7 +49,7 @@ class MachineRollerComponent extends PositionComponent {
       print('開始');
       _rollerState = RollerStatus.starting;
       for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
-        // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.general);
+        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.general);
       }
     }
   }
@@ -78,14 +77,16 @@ class MachineRollerComponent extends PositionComponent {
     }
   }
 
-  void showWinningSymbol(){
-    // for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
-    //   // if(symbol.rollerSymbolModel.isWinningSymbol){
-    //     // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.animation);
-    //   }else{
-    //     // symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.mask);
-    //   }
-    // }
+  void showWinningSymbol({required List<int> indexList}){
+    for(MachineRollerSymbol symbol in _slotMachineRollerSymbolList){
+      int index = symbol.index;
+      if (indexList.contains(index)) {
+        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.animation);
+      }else{
+        symbol.updateRollerSymbolStatus(MachineRollerSymbolStatus.mask);
+
+      }
+    }
   }
 
 

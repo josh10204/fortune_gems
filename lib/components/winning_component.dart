@@ -10,9 +10,12 @@ import 'package:fortune_gems/test_particle_component.dart';
 
 
 enum WinningType{
-  bigWin,
-  megaWin,
-  superWin
+  none(ratio: 0),
+  bigWin(ratio: 5),
+  megaWin(ratio: 15),
+  superWin(ratio: 30);
+  final int ratio;
+  const WinningType({required this.ratio});
 }
 
 class WinningComponent extends PositionComponent {
@@ -56,6 +59,8 @@ class WinningComponent extends PositionComponent {
         return 'images/win_mega.png';
       case WinningType.superWin:
         return 'images/win_super.png';
+      default:
+        return '';
     }
   }
 
@@ -67,6 +72,8 @@ class WinningComponent extends PositionComponent {
         return 'images/win_mega_win.png';
       case WinningType.superWin:
         return 'images/win_super_win.png';
+      default:
+        return '';
     }
   }
 

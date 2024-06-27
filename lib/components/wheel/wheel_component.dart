@@ -6,6 +6,8 @@ import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/wheel/wheel_item.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
+import 'package:fortune_gems/extension/string_extension.dart';
+import 'package:fortune_gems/system/global.dart';
 
 enum WheelRotateStatus {
   opening,
@@ -18,10 +20,10 @@ enum WheelRotateStatus {
   still,
 }
 class WheelComponent extends PositionComponent {
-  WheelComponent({super.position,super.anchor ,required this.onCallBack}) : super(size: Vector2(1290, 2796));
-  final void Function() onCallBack;
+  WheelComponent({super.position,super.anchor }) : super(size: Vector2(1290, 2796));
 
 
+  late Global _global;
   WheelRotateStatus _rotateStatus = WheelRotateStatus.starting;
   late RectangleComponent _backgroundComponent;
   late PositionComponent _basicWheel;
@@ -29,6 +31,7 @@ class WheelComponent extends PositionComponent {
   late SpriteComponent _wheelFrame;
   late SpriteComponent _wheelSelectFrame;
   late SpriteComponent _wheelCenterLogo;
+  Function()? _onStopCallBack;
   // final List<WheelItemType> _wheelItemList = WheelItemType.values;
   List<WheelItem> _wheelItemList = [];
 
@@ -40,14 +43,14 @@ class WheelComponent extends PositionComponent {
   double _bounceRangeStartAngle = 0;
   double _bounceRangeEndAngle = 0;
 
-  late WheelItemType _stopWheelItemModel;
+  late WheelItemType _stopWheelItemType;
 
-  /// 測試暫時數據
-  static const int _stopItemSerial = 2;//停止轉盤格子編號
 
   Timer _waitUpdateTimer = Timer(1);
 
-  Future<void> startLottery() async {
+  Future<void> startLottery({required int stopRatio ,required Function() onCallBack}) async {
+    _global.gameStatus = GameStatus.startWheel;
+    _onStopCallBack = onCallBack;
     _rotateStatus = WheelRotateStatus.opening;
     _zoomEffect(
       onFadeOutComplete: () {
@@ -56,10 +59,11 @@ class WheelComponent extends PositionComponent {
       onFadeInComplete: () async {
         _showBackgroundComponent();
         _rotateStatus = WheelRotateStatus.starting;
-        /// 測試暫時數據
-        _stopWheelItemModel =  WheelItemType.values[_stopItemSerial];
-        _bounceRangeStartAngle = _stopWheelItemModel.startAngle;
-        _bounceRangeEndAngle = _stopWheelItemModel.endAngle;
+        // _stopWheelItemType =  stopRatio.toString().getWheelItemTypeFromRatio;
+        _stopWheelItemType =  WheelItemType.item1x;
+
+        _bounceRangeStartAngle = _stopWheelItemType.startAngle;
+        _bounceRangeEndAngle = _stopWheelItemType.endAngle;
         await Future.delayed(const Duration(milliseconds: 500));
         _rotateStatus = WheelRotateStatus.speedUp;
         await Future.delayed(const Duration(seconds: 1));
@@ -81,6 +85,7 @@ class WheelComponent extends PositionComponent {
 
   @override
   Future<void> onLoad() async {
+    _global = Global();
     _initBasicWheel();
     await _initWheel();
     await _initWheelFrame();
@@ -119,7 +124,7 @@ class WheelComponent extends PositionComponent {
   void _initWheelItem(){
 
     for(WheelItemType itemType in WheelItemType.values){
-      WheelItem item = WheelItem(type: itemType,betNumber: 1 ,basicCenter: _basicWheel.localCenter);
+      WheelItem item = WheelItem(type: itemType,betAmount:_global.betAmount  ,basicCenter: _basicWheel.localCenter);
       item.priority = 2;
       _wheelItemList.add(item);
       _basicWheel.add(item);
@@ -192,8 +197,8 @@ class WheelComponent extends PositionComponent {
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = false;
-      if(_bounceRangeStartAngle>=_stopWheelItemModel.centerAngle ||
-          _bounceRangeEndAngle<= _stopWheelItemModel.centerAngle){
+      if(_bounceRangeStartAngle >= _stopWheelItemType.centerAngle ||
+          _bounceRangeEndAngle <= _stopWheelItemType.centerAngle){
         _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
@@ -207,8 +212,8 @@ class WheelComponent extends PositionComponent {
       _bounceRangeStartAngle += 0.04;
       _bounceRangeEndAngle -= 0.04;
       _isBounceForward = true;
-      if(_bounceRangeStartAngle>=_stopWheelItemModel.centerAngle ||
-          _bounceRangeEndAngle<= _stopWheelItemModel.centerAngle){
+      if(_bounceRangeStartAngle >= _stopWheelItemType.centerAngle ||
+          _bounceRangeEndAngle <= _stopWheelItemType.centerAngle){
         _rotateStatus  =  WheelRotateStatus.stopping;
       }
     }else{
@@ -219,7 +224,7 @@ class WheelComponent extends PositionComponent {
   }
 
   Future<void> _stoppingOffsetAngle({required double dt})  async {
-    _basicWheel.angle = _stopWheelItemModel.centerAngle;
+    _basicWheel.angle = _stopWheelItemType.centerAngle;
     _waitUpdateTimer.update(dt);
     if (_waitUpdateTimer.finished) {
       _rotateStatus  =  WheelRotateStatus.stopped;
@@ -237,7 +242,8 @@ class WheelComponent extends PositionComponent {
         priority = 1;
       },
       onFadeInComplete: () {
-        onCallBack.call();
+        _global.gameStatus = GameStatus.stopWheel;
+        _onStopCallBack?.call();
       },
     );
     // _hideBackgroundComponent();
@@ -270,11 +276,11 @@ class WheelComponent extends PositionComponent {
     for(WheelItem item in _wheelItemList){
       item.openEffect();
     }
-    RotateEffect rotateEffect = RotateEffect.to(
-      180 * 3.14 / 180,
-      EffectController(duration: 0.8),
-    );
-    _basicWheel.add(rotateEffect);
+    // RotateEffect rotateEffect = RotateEffect.to(
+    //   180 * 3.14 / 180,
+    //   EffectController(duration: 0.8),
+    // );
+    // _basicWheel.add(rotateEffect);
 
     ScaleEffect scaleUpEffect = ScaleEffect.to(
         Vector2(1.5,1.5),

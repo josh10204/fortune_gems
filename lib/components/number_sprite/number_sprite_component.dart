@@ -13,11 +13,17 @@ class NumberSpriteComponent extends PositionComponent {
 
   late PositionComponent _basicComponent;
 
+  void resetNumber(double number){
+    remove(_basicComponent);
+    _initBasicComponent();
+    _initNumber(number);
+  }
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
     _initBasicComponent();
-    _updateNumber(number);
+    _initNumber(number);
 
   }
 
@@ -26,7 +32,7 @@ class NumberSpriteComponent extends PositionComponent {
     add(_basicComponent);
   }
 
-  void _updateNumber(double number){
+  void _initNumber(double number){
     String numberString = number.toString();
     List<String> numberList = numberString.split('');
     double positionX = 0;

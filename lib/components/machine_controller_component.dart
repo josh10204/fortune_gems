@@ -7,6 +7,7 @@ import 'package:flame/flame.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/particles.dart';
 import 'package:flame/text.dart';
+import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/system/global.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
@@ -37,10 +38,10 @@ class MachineControllerComponent extends PositionComponent {
   final Color _textSubTitleColor = const Color.fromRGBO(255, 255, 255, 1);
 
   late Global _global;
-  double _balanceAmount = 2000;
+  double _balanceAmount = Global().balanceAmount;
   double _winAmount = 0.00;
-  GridItems _currentBetGridItems = GridItems.item15;
-  double _betAmount = double.parse(GridItems.item15.text);
+  GridItems _currentBetGridItems = Global().betAmount.toString().getGridItems;
+  double _betAmount = Global().betAmount.toDouble();
 
 
   late TextComponent _balanceTitleText;
@@ -399,7 +400,8 @@ class MachineControllerComponent extends PositionComponent {
       defaultGridItems: _currentBetGridItems,
       onSelectCallBack: (gridItems) {
         _currentBetGridItems = gridItems;
-        _betAmount = double.parse(gridItems.text);
+        _global.betAmount = int.parse(gridItems.text);
+        _betAmount = _global.betAmount.toDouble();
         _betAmountText.text = gridItems.text;
         onTapBetButton.call(_betAmount);
       },

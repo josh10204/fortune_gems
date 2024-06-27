@@ -22,7 +22,7 @@ import 'package:fortune_gems/system/global.dart';
 
 class MachineComponent extends PositionComponent with TapCallbacks{
   MachineComponent({required this.onCallBack}) : super(size: Vector2(1290, 2796),anchor: Anchor.topCenter);
-  final void Function() onCallBack;
+  final void Function(int ratio, int luckyRatio, double resultAmount) onCallBack;
 
   late Global _global;
   late SpriteComponent _machineFrame;
@@ -37,20 +37,30 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   // bool _isStartRolling = false;
   // bool _isEnableRolling = true;
 
+  /// 全部中獎賠付線類型
+  List<RollerPayLineType> _allPayLineTypeList = [];
+  /// 判斷此局是否有中獎
+  bool _isHasWinning = false;
+  /// 中獎倍率
+  int _ratio = 0;
+  /// 幸運輪盤中獎倍率
+  int _luckyRatio = 1;
+  /// 單局全部中獎分數（不含中獎倍率，除非幸運輪盤）
+  double _playResultAmount = 0;
+
 
   /// demo資料順序
-  int _currentDemoIndex = 0;
+  int _currentDemoIndex = 1;
   void startRollingMachine(){
     if(_global.gameStatus == GameStatus.idle){
+      _global.gameStatus = GameStatus.startSpin;
       _startRolling();
-
     }
   }
 
   void autoRollingMachine(bool isEnable){}
 
   Future<void> _startRolling() async {
-    _global.gameStatus = GameStatus.spinStopped;
     for(MachineRollerComponent machineRollerComponent in _rollers){
       machineRollerComponent.startRolling();
       await Future.delayed(const Duration(milliseconds: 400));
@@ -58,11 +68,15 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _updateRollerSymbol();
   }
   Future<void> _updateRollerSymbol() async {
-    SlotGameModel gameModel = SlotGameModel.fromJson(DemoData().resultMap);
-    List<Detail> detailList = gameModel.detail??[];
     /// 模擬資料
+    SlotGameModel gameModel = SlotGameModel.fromJson(DemoData().resultMap);
+
+    /// 顯示盤面處理
+    List<Detail> detailList = gameModel.detail??[];
     Detail detail = detailList[_currentDemoIndex];
-    String ratio = detail.ratio.toString() ??'1';
+    _ratio = detail.ratio ?? 0;
+    _luckyRatio = detail.luckyRatio ?? 1;
+    String ratio = _ratio.toString();
     List<String> panelList =detail.panel??[];
     List<String> firstList = [];
     List<String> secondList = [];
@@ -79,11 +93,29 @@ class MachineComponent extends PositionComponent with TapCallbacks{
       }
     }
 
+    /// 中獎結果處理
+    List<Result> resultList =detail.result??[];
+    // 是否有中獎
+    _isHasWinning = resultList.isNotEmpty;
+    // 全部中獎線
+    _allPayLineTypeList = [];
+    _playResultAmount = 0;
+    for (Result result in resultList) {
+      _allPayLineTypeList.add(result.line.toString().getRollerPayLineType);
+      _playResultAmount += result.playResult ??0;
+    }
+    if(_ratio !=0 ){
+      _playResultAmount = _playResultAmount/_ratio;
+    }
 
-    List<RollerSymbolModel> firstModelList = _getRollerSymbolModelList(list: firstList);
-    List<RollerSymbolModel> secondModelList = _getRollerSymbolModelList(list: secondList);
-    List<RollerSymbolModel> thirdModelList = _getRollerSymbolModelList(list: thirdList);
-    List<RollerSymbolModel> ratioModelList = _getRollerSymbolModelList(list: ratioList);
+    /// 資料轉換成RollerSymbolModel
+    List<RollerSymbolModel> firstModelList = _getRollerSymbolModelList(symbolList: firstList,allResultList:resultList);
+    List<RollerSymbolModel> secondModelList = _getRollerSymbolModelList(symbolList: secondList,allResultList:resultList);
+    List<RollerSymbolModel> thirdModelList = _getRollerSymbolModelList(symbolList: thirdList,allResultList:resultList);
+    List<RollerSymbolModel> ratioModelList = _getRollerSymbolModelList(symbolList: ratioList,allResultList:[]);
+
+
+    /// 更新資料
     _firstMachineRollerComponent.updateRollerSymbolList(modelList:firstModelList);
     _secondMachineRollerComponent.updateRollerSymbolList(modelList:secondModelList);
     _thirdMachineRollerComponent.updateRollerSymbolList(modelList:thirdModelList);
@@ -97,10 +129,10 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _stopRolling();
   }
 
-  List<RollerSymbolModel> _getRollerSymbolModelList({required List<String> list}){
+  List<RollerSymbolModel> _getRollerSymbolModelList({required List<String> symbolList,required List<Result> allResultList}){
 
     List<RollerSymbolModel> modelList = [];
-    for(String symbol in list){
+    for(String symbol in symbolList){
       RollerSymbolType type = symbol.getRollerSymbolType;
       RollerSymbolModel model = RollerSymbolModel(type: type);
       modelList.add(model);
@@ -110,7 +142,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
 
   Future<void> _stopRolling() async {
-    _global.gameStatus = GameStatus.spinStopped;
+    _global.gameStatus = GameStatus.stopSpin;
     _firstMachineRollerComponent.stopRolling();
     await Future.delayed(const Duration(milliseconds: 500));
     _secondMachineRollerComponent.stopRolling();
@@ -120,16 +152,14 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _ratioMachineRollerComponent.stopRolling();
   }
 
-  Future<void> _showAllWinningSymbol() async {
-    _firstMachineRollerComponent.showWinningSymbol();
-    _secondMachineRollerComponent.showWinningSymbol();
-    _thirdMachineRollerComponent.showWinningSymbol();
-    _ratioMachineRollerComponent.showWinningSymbol();
-
-    _showScoreBoardComponent();
-    await Future.delayed(const Duration(seconds: 3));
-    remove(_scoreBoardComponent);
-    onCallBack.call();
+  Future<void> _stopResult() async {
+    if(_isHasWinning){
+      _global.gameStatus = GameStatus.openScoreBoard;
+      _showRollerWinningSymbolAnimation();
+      onCallBack(_ratio, _luckyRatio,_playResultAmount);
+    }else{
+      _global.gameStatus = GameStatus.idle;
+    }
   }
 
   /// 是否當前滾輪都是停止狀態
@@ -163,7 +193,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _secondMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position: Vector2(332,135),priority:1,onStopCallBack:(){});
     _thirdMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position:  Vector2(635,135),priority:0,onStopCallBack:(){});
     _ratioMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.ratio,position: Vector2(930,135),priority:1,onStopCallBack:(){
-      _showAllWinningSymbol();
+      _stopResult();
     });
     _rollers.addAll([
       _firstMachineRollerComponent,
@@ -174,18 +204,26 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     addAll(_rollers);
   }
 
- void _initMachineBanner() {
+  void _initMachineBanner() {
     _machineBanner = MachineBannerComponent(priority: 2);
     add(_machineBanner);
   }
 
-  void _showScoreBoardComponent(){
-    _scoreBoardComponent = ScoreBoardComponent(type: ScoreBoardType.common);
-    double positionX = 0;
-    double positionY = localCenter.y/3 - _scoreBoardComponent.size.y/2;
-    _scoreBoardComponent.position = Vector2(positionX,positionY);
-    _scoreBoardComponent.priority = 3;
-    add(_scoreBoardComponent);
+  Future<void> _showRollerWinningSymbolAnimation() async {
+
+    _ratioMachineRollerComponent.showWinningSymbol(indexList:[1]);
+    bool isPlay = true;
+    while(isPlay){
+      isPlay =  _global.gameStatus == GameStatus.idle || _global.gameStatus == GameStatus.openScoreBoard || _global.gameStatus == GameStatus.startScoreBoard;
+      if (!isPlay) break;
+      for(RollerPayLineType payLineType in  _allPayLineTypeList){
+        _firstMachineRollerComponent.showWinningSymbol(indexList: payLineType.firstRollerItemIndexList);
+        _secondMachineRollerComponent.showWinningSymbol(indexList:payLineType.secondRollerItemIndexList);
+        _thirdMachineRollerComponent.showWinningSymbol(indexList:payLineType.thirdIRollerItemIndexList);
+        await Future.delayed(const Duration(milliseconds: 2000));
+      }
+
+    }
   }
 
   @override
@@ -201,9 +239,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
   @override
   void onTapDown(TapDownEvent event) {
-    if(_global.gameStatus == GameStatus.idle){
-      _startRolling();
-    }
+    startRollingMachine();
     super.onTapDown(event);
 
   }

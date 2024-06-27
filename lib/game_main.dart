@@ -9,6 +9,7 @@ import 'package:fortune_gems/components/machine_controller_component.dart';
 import 'package:fortune_gems/components/score_board_component.dart';
 import 'package:fortune_gems/components/wheel/wheel_component.dart';
 import 'package:fortune_gems/components/winning_component.dart';
+import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/system/global.dart';
 
 
@@ -23,6 +24,7 @@ class GameMain extends FlameGame{
   late WheelComponent _wheelComponent;
   late MachineControllerComponent _machineControllerComponent;
   late WinningComponent _winningComponent;
+  late ScoreBoardComponent _scoreBoardComponent;
 
 
   GameMain() : super(camera: CameraComponent.withFixedResolution(width: 1290, height:2796)) {
@@ -31,21 +33,56 @@ class GameMain extends FlameGame{
 
   }
 
-
-  void _showWheelComponent(){
-    _wheelComponent.startLottery();
-    _global.gameStatus = GameStatus.wheelSpinning;
+  void _showScoreBoardComponent({required int ratio, required int luckyRatio, required double resultAmount})  {
+    ScoreBoardType type = ratio == 0 ?ScoreBoardType.wheel:ScoreBoardType.common;
+    double positionX = 0;
+    double positionY = size.y * 0.13;
+    _scoreBoardComponent = ScoreBoardComponent(
+        anchor: Anchor.topCenter,
+        position: Vector2(positionX,positionY),
+        type: type,
+        ratio: ratio,
+        luckyRatio: luckyRatio,
+        scoreAmount: 100,
+        onCallBack: (totalScoreAmount,winningType){
+          if(_global.gameStatus == GameStatus.stopScoreBoard){
+            _global.gameStatus = GameStatus.idle;
+            world.remove(_scoreBoardComponent);
+          }
+          if(_global.gameStatus == GameStatus.openWheel){
+            _showWheelComponent(luckyRatio: luckyRatio);
+          }
+          if(_global.gameStatus == GameStatus.openBigWinning){
+            _showWinningEffectComponent();
+            world.remove(_scoreBoardComponent);
+          }
+        });
+    _scoreBoardComponent.priority = 3;
+    world.add(_scoreBoardComponent);
   }
 
-  Future<void> _showWinningEffectComponent() async {
-    _winningComponent = WinningComponent(
-      anchor: Anchor.center,
-      position: Vector2.zero(),
-      onCallBack: (){
+
+  void _showWheelComponent({required int luckyRatio}){
+    _wheelComponent.startLottery(stopRatio: luckyRatio, onCallBack: (){
+      ///TODO：判斷是否有中大獎
+      if(_global.gameStatus == GameStatus.openBigWinning){
+        _showWinningEffectComponent();
+        world.remove(_scoreBoardComponent);
+      }else{
         _global.gameStatus = GameStatus.idle;
-        _winningComponent.priority = 0;
-        world.remove(_winningComponent);
+        _scoreBoardComponent.updateAdditionAmount(luckyRatio.toDouble());
       }
+    });
+  }
+  void _showWinningEffectComponent() {
+    _winningComponent = WinningComponent(
+        anchor: Anchor.center,
+        position: Vector2.zero(),
+        onCallBack: (){
+          _global.gameStatus = GameStatus.idle;
+          _winningComponent.priority = 0;
+          world.remove(_winningComponent);
+        }
     );
     _winningComponent.priority = 3;
     world.add(_winningComponent);
@@ -72,26 +109,20 @@ class GameMain extends FlameGame{
   void _initWheelComponent(){
     _wheelComponent = WheelComponent(
         anchor: Anchor.center,
-        position: Vector2.zero(),
-        onCallBack: () {
-          ///TODO：判斷是否有中大獎
-          _global.gameStatus = GameStatus.winningEffect;
-          _showWinningEffectComponent();
-        });
+        position: Vector2.zero(),);
     _wheelComponent.priority = 1;
     world.add(_wheelComponent);
   }
 
+
   void _initMachineComponent()  {
-    _machineComponent  = MachineComponent(onCallBack: (){
-      _showWheelComponent();
+
+    _machineComponent  = MachineComponent(onCallBack: (ratio,luckyRatio,resultAmount){
+      _showScoreBoardComponent(ratio:ratio,luckyRatio: luckyRatio,resultAmount: resultAmount);
     });
     _machineComponent.priority = 2;
-
     world.add(_machineComponent);
   }
-
-
 
   void _intiMachineControllerComponent(){
     _machineControllerComponent = MachineControllerComponent(

@@ -1,6 +1,13 @@
+
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 import 'package:fortune_gems/components/number_sprite/number_sprite_component.dart';
+import 'package:fortune_gems/components/winning_component.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
+import 'package:fortune_gems/extension/string_extension.dart';
+import 'package:fortune_gems/model/rolller_symbol_model.dart';
+import 'package:fortune_gems/system/global.dart';
 
 
 enum ScoreBoardType{
@@ -14,31 +21,39 @@ enum ScoreBoardType{
 }
 
 class ScoreBoardComponent extends PositionComponent {
-  ScoreBoardComponent({super.position,required this.type}) : super(size: Vector2(1290, 220));
-
+  ScoreBoardComponent({super.position,super.anchor,required this.type,required this.ratio,required this.luckyRatio, required this.scoreAmount,required this.onCallBack}) : super(size: Vector2(1290, 227.2));
+  final void Function(double totalScoreAmount,WinningType winningType) onCallBack;
   ScoreBoardType type;
+  double scoreAmount;
+  int ratio;
+  int luckyRatio;
 
+  late Global _global;
   late SpriteComponent _frameSpriteComponent;
   late SpriteComponent _titleSpriteComponent;
   late SpriteComponent  _plusSpriteComponent;
   late NumberSpriteComponent  _numberSpriteComponent;
   late NumberSpriteComponent  _additionNumberSpriteComponent;
+  late SpriteComponent _rollerSymbol;
 
   final Vector2 _commonContentPending  = Vector2(25, 15); // 數字顯示範圍的上下左右間距(依圖檔不同修改)
   final Vector2 _wheelContentPending  = Vector2(80, 20); // 數字顯示範圍的上下左右間距(依圖檔不同修改)
 
   late Vector2 _contentSize; // 數字顯示範圍的寬高
 
+  double _totalScoreAmount = 0;
 
-  void updateScoreBoard(){
-
-
+  Future<void> updateAdditionAmount(double number) async {
+    _additionNumberSpriteComponent.resetNumber(number);
+    _totalScoreAmount = scoreAmount + number;
+    _updateScoreBoardStatus();
   }
-
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    _global = Global();
+    _global.gameStatus =GameStatus.startScoreBoard;
     _loadData();
     await _initFrameSpriteComponent();
     await _initTitleSpriteComponent();
@@ -99,21 +114,39 @@ class ScoreBoardComponent extends PositionComponent {
     _frameSpriteComponent.add(_plusSpriteComponent);
   }
 
-  void _initNumberSpriteComponent(){
+  Future<void> _initNumberSpriteComponent() async {
     if(type == ScoreBoardType.common){
       _initCommonNumberSpriteComponent();
+      _initRatioRollerSymbol();
+      await Future.delayed(const Duration(milliseconds: 1000));
+      _showCommonScoreBoardEffect();
     }else{
       _initWheelNumberSpriteComponent();
       _initAdditionNumberSpriteComponent();
+      _updateScoreBoardStatus();
     }
   }
-
 
   void _initCommonNumberSpriteComponent(){
     double positionX = _commonContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - _contentSize.y/2;
-    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size:_contentSize,number:200.02,fontScale: 1);
+    _totalScoreAmount = scoreAmount * ratio;
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size:_contentSize,number:scoreAmount,fontScale: 1);
     _frameSpriteComponent.add(_numberSpriteComponent);
+  }
+
+  Future<void> _initRatioRollerSymbol() async {
+    RollerSymbolType type = ratio.toString().getRollerSymbolType;
+    double width = 278.4;
+    double height = 227.2;
+    double positionX = size.x - width*0.7;
+    double positionY = height/2;
+    _rollerSymbol = SpriteComponent(
+        sprite: await Sprite.load(type.imagePath),
+        size: Vector2(width, height),
+        position: Vector2(positionX, positionY),
+        anchor: Anchor.center);
+    add(_rollerSymbol);
   }
 
   void _initWheelNumberSpriteComponent(){
@@ -121,7 +154,7 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:1025,fontScale: 1);
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:scoreAmount,fontScale: 1);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
 
@@ -130,11 +163,50 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = width + _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _additionNumberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:1,fontScale: 1);
-    // _additionNumberSpriteComponent.position = Vector2(positionX,positionY);
+    _additionNumberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:0,fontScale: 1);
     _frameSpriteComponent.add(_additionNumberSpriteComponent);
   }
 
 
+  Future<void> _showCommonScoreBoardEffect() async {
+    _numberSpriteComponent.resetNumber(_totalScoreAmount);
+    ScaleEffect scaleEffect = ScaleEffect.to(Vector2(1.2,1.2), EffectController(duration: 1,curve: Curves.elasticOut),);
+    MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, size.y/2), EffectController(duration: 1),);
+    OpacityEffect opacityEffect = OpacityEffect.fadeOut(EffectController(duration: 1),);
+    _rollerSymbol.add(scaleEffect);
+    await Future.delayed(const Duration(seconds: 1));
+    _rollerSymbol.add(moveEffect);
+    _rollerSymbol.add(opacityEffect);
+    _updateScoreBoardStatus();
+  }
 
+  Future<void> _updateScoreBoardStatus() async {
+    await Future.delayed(const Duration(milliseconds: 1500));
+    WinningType winningType = _checkWinningType();
+    if(type == ScoreBoardType.common){
+      if(winningType != WinningType.none){
+        _global.gameStatus = GameStatus.openBigWinning;
+      }else{
+        _global.gameStatus = GameStatus.stopScoreBoard;
+      }
+
+    }else{
+      if(winningType != WinningType.none){
+        _global.gameStatus = GameStatus.openBigWinning;
+      }else{
+        _global.gameStatus = GameStatus.openWheel;
+      }
+    }
+    onCallBack.call(_totalScoreAmount,winningType);
+  }
+
+  WinningType _checkWinningType(){
+    WinningType winningType = WinningType.none;
+    for(WinningType type in WinningType.values){
+      if(_totalScoreAmount >= _global.betAmount * type.ratio){
+        winningType = type;
+      }
+    }
+    return winningType;
+  }
 }

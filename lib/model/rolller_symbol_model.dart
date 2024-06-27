@@ -30,6 +30,19 @@ enum RollerSymbolType{
   const RollerSymbolType({required this.imagePath, required this.unselectImagePath});
 }
 
+enum RollerPayLineType{
+  none(firstRollerItemIndexList: [],secondRollerItemIndexList: [],thirdIRollerItemIndexList: []),
+  centerLine(firstRollerItemIndexList: [1],secondRollerItemIndexList: [1],thirdIRollerItemIndexList: [1]),
+  topLine(firstRollerItemIndexList: [0],secondRollerItemIndexList: [0],thirdIRollerItemIndexList: [0]),
+  bottomLine(firstRollerItemIndexList: [2],secondRollerItemIndexList: [2],thirdIRollerItemIndexList: [2]),
+  leftSlashLine(firstRollerItemIndexList: [0],secondRollerItemIndexList: [1],thirdIRollerItemIndexList: [2]),
+  rightSlashLine(firstRollerItemIndexList: [2],secondRollerItemIndexList: [1],thirdIRollerItemIndexList: [0]);
+  final List<int> firstRollerItemIndexList;
+  final List<int> secondRollerItemIndexList;
+  final List<int> thirdIRollerItemIndexList;
+  const RollerPayLineType({required this.firstRollerItemIndexList, required this.secondRollerItemIndexList, required this.thirdIRollerItemIndexList});
+
+}
 
 class RollerSymbolModel{
 
@@ -37,5 +50,4 @@ class RollerSymbolModel{
     required this.type,
   });
   RollerSymbolType type;
-
 }

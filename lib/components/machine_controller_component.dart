@@ -91,12 +91,13 @@ class MachineControllerComponent extends PositionComponent {
     _isShowSettingMenu = false;
     remove(_settingMenu);
   }
-
-
   void updateWinAmount(double winAmount){
     _winAmountText.text = winAmount.toStringAsFixed(2);
-    _global.balanceAmount += winAmount;
-    _balanceAmountText.text = _global.balanceAmount.toStringAsFixed(2);
+    if(winAmount>0){
+      _global.balanceAmount += winAmount;
+      _balanceAmountText.text = _global.balanceAmount.toStringAsFixed(2);
+    }
+
   }
   @override
   Future<void> onLoad() async {

@@ -1,13 +1,15 @@
 import 'dart:developer';
 import 'package:flame/components.dart';
+import 'package:flutter/services.dart';
 
 /// 這是一個用數字圖 png 來拚出來的 2D 數字元件，目前只支援顯示正整數。
 /// 目前支援使用檔名: 0.png ~ 9.png 來製成元件，這些圖片都必須要有。
 /// fixedLength 指定位數長度，不足長的 int 在高位數會以 0 顯示來補足長度。
 /// fixedLength 為 0 時則為不指定長度。
-class SpriteNumberComponent extends PositionComponent {
+class SpriteNumberComponent extends PositionComponent  {
   SpriteNumberComponent({
     required String srcDirPath,
+    this.fileNamePrefix = '',
     this.initNum,
     this.fixedDigitLength = 0,
     this.fixedDecimalPlaceLength = -1,
@@ -19,10 +21,15 @@ class SpriteNumberComponent extends PositionComponent {
     super.priority,
     super.key,
     this.onTickComplete,
+    this.onTickNumberUpdate,
+    this.onTickProgressUpdate,
   }) : _srcDirPath = srcDirPath.endsWith('/') ? srcDirPath : '$srcDirPath/';
 
   /// The source images dir path.
   final String _srcDirPath;
+
+  /// 檔名前墜。例如檔案為 FreeGame_0.png ~ FreeGame_9.png 則此參數填 'FreeGame_' 即可。
+  final String fileNamePrefix;
 
   /// This number should be set after onLoad() finished.
   final num? initNum;
@@ -77,23 +84,38 @@ class SpriteNumberComponent extends PositionComponent {
   // 跳動間隔時間。
   static const double _tickRateTime = 0.025;
 
-  // 當完成 tick 時會被呼叫。
+  /// 當完成 tick 時會被呼叫。
   final Function()? onTickComplete;
+
+  /// tick 過程數字更新時會被呼叫。
+  final Function(double)? onTickNumberUpdate;
+  /// tick 過程進度更新時會被呼叫。 0.0 ~ 1.0
+  final Function(double)? onTickProgressUpdate;
 
   @override
   Future<void> onLoad() async {
     // 嘗試載入 comma， 允許無檔案的狀況。
+    ByteData? tryPreloadComma;
     try {
-      _commaSprite = await Sprite.load('${_srcDirPath}numbers_comma.$fileExt');
-    } catch (_) {
-      log('[No comma file]: $_srcDirPath');
+      tryPreloadComma = await rootBundle.load('images/$_srcDirPath${fileNamePrefix}numbers_comma.$fileExt');
+    } catch (_) { log('[No comma file]: images/$_srcDirPath$fileNamePrefix'); }
+
+    if (tryPreloadComma != null) {
+      try {
+        _commaSprite = await Sprite.load('${_srcDirPath}numbers_comma.$fileExt');
+      } catch (_) { }
     }
 
     // 嘗試載入 decimal point， 允許無檔案的狀況。
+    ByteData? tryPreloadDecimal;
     try {
-      _decimalPointSprite = await Sprite.load('${_srcDirPath}numbers_point.$fileExt');
-    } catch (_) {
-      log('[No comma file]: $_srcDirPath');
+      tryPreloadDecimal = await rootBundle.load('${_srcDirPath}numbers_point.$fileExt');
+    } catch (_) { log('[No decimal point file]: images/$_srcDirPath$fileNamePrefix'); }
+
+    if (tryPreloadDecimal != null) {
+      try {
+        _decimalPointSprite = await Sprite.load('${_srcDirPath}numbers_point.$fileExt');
+      } catch (_) { }
     }
 
     try {
@@ -120,7 +142,7 @@ class SpriteNumberComponent extends PositionComponent {
 
       // log('[SpriteNumberComponent Load Success]');
     } catch (e) {
-      log('[SpriteNumberComponent Load Failed!]: $_srcDirPath | $e');
+      log('[SpriteNumberComponent Load Failed!]: $_srcDirPath$fileNamePrefix | $e');
     }
 
     super.onLoad();
@@ -139,9 +161,14 @@ class SpriteNumberComponent extends PositionComponent {
         double totalDiff = _tickToTarget - _startTickingNumber;
         double progressRate = totalDuration != 0 ?  _tickAccumulatedTime / totalDuration : 1;
         double currentDiff = totalDiff * progressRate;
+        double currentNumber = _startTickingNumber + currentDiff;
 
         //Set the thing.
-        set(_startTickingNumber + currentDiff);
+        set(currentNumber);
+
+        //回報進度。
+        onTickNumberUpdate?.call(currentNumber);
+        onTickProgressUpdate?.call(progressRate);
 
         _tickRateAccumulatedTime -= _tickRateTime;
       }
@@ -307,6 +334,23 @@ class SpriteNumberComponent extends PositionComponent {
     }
     return false;
   }
+
+  /// 取得當前顯示數字的邏輯大小，注意這個不會考慮 scale.
+  Vector2 get logicSize {
+    double width = 0;
+    double height = 0;
+    for (SpriteComponent spriteComponent in _spriteComponents) {
+      if (spriteComponent.sprite != null) {
+        width += spriteComponent.sprite!.originalSize.x;
+        if (spriteComponent.sprite!.originalSize.y > height) {
+          height = spriteComponent.sprite!.originalSize.y;
+        }
+      }
+    }
+    return Vector2(width, height);
+  }
+
+  //--
 
   // 內部用: Calculate and get all digits of a input number. From low to high.
   List<int> _getIntDigits(int value) {

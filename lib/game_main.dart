@@ -45,16 +45,19 @@ class GameMain extends FlameGame{
         luckyRatio: luckyRatio,
         scoreAmount: 100,
         onCallBack: (totalScoreAmount,winningType){
-          if(_global.gameStatus == GameStatus.stopScoreBoard){
-            _global.gameStatus = GameStatus.idle;
-            world.remove(_scoreBoardComponent);
-          }
-          if(_global.gameStatus == GameStatus.openWheel){
-            _showWheelComponent(luckyRatio: luckyRatio);
-          }
-          if(_global.gameStatus == GameStatus.openBigWinning){
-            _showWinningEffectComponent();
-            world.remove(_scoreBoardComponent);
+          switch(_global.gameStatus){
+            case GameStatus.openWheel:
+              _showWheelComponent(luckyRatio: luckyRatio);
+              break;
+            case GameStatus.openBigWinning:
+              _showWinningEffectComponent(winningType,totalScoreAmount);
+              world.remove(_scoreBoardComponent);
+              break;
+            default:
+              _global.gameStatus = GameStatus.idle;
+              _machineControllerComponent.updateWinAmount(totalScoreAmount);
+              world.remove(_scoreBoardComponent);
+              break;
           }
         });
     _scoreBoardComponent.priority = 3;
@@ -63,24 +66,21 @@ class GameMain extends FlameGame{
 
 
   void _showWheelComponent({required int luckyRatio}){
-    _wheelComponent.startLottery(stopRatio: luckyRatio, onCallBack: (){
-      ///TODO：判斷是否有中大獎
-      if(_global.gameStatus == GameStatus.openBigWinning){
-        _showWinningEffectComponent();
-        world.remove(_scoreBoardComponent);
-      }else{
-        _global.gameStatus = GameStatus.idle;
-        _scoreBoardComponent.updateAdditionAmount(luckyRatio.toDouble());
-      }
+    _wheelComponent.startLottery(stopRatio: luckyRatio, onCallBack: (ratioAmount){
+        _scoreBoardComponent.updateAdditionAmount(ratioAmount);
     });
   }
-  void _showWinningEffectComponent() {
+  void _showWinningEffectComponent(WinningType winningType,double scoreAmount,) {
     _winningComponent = WinningComponent(
         anchor: Anchor.center,
         position: Vector2.zero(),
+        winningType: winningType,
+        scoreAmount: scoreAmount,
         onCallBack: (){
           _global.gameStatus = GameStatus.idle;
           _winningComponent.priority = 0;
+          _machineControllerComponent.updateWinAmount(scoreAmount);
+
           world.remove(_winningComponent);
         }
     );
@@ -116,10 +116,16 @@ class GameMain extends FlameGame{
 
 
   void _initMachineComponent()  {
-
-    _machineComponent  = MachineComponent(onCallBack: (ratio,luckyRatio,resultAmount){
-      _showScoreBoardComponent(ratio:ratio,luckyRatio: luckyRatio,resultAmount: resultAmount);
-    });
+    _machineComponent = MachineComponent(
+        onStartCallBack: () {
+          _machineControllerComponent.updateWinAmount(0.00);
+          _machineControllerComponent.hideBetMenu();
+          _machineControllerComponent.hideSettingMenu();
+        },
+        onStopCallBack: (ratio, luckyRatio, resultAmount) {
+          _showScoreBoardComponent(
+              ratio: ratio, luckyRatio: luckyRatio, resultAmount: resultAmount);
+        });
     _machineComponent.priority = 2;
     world.add(_machineComponent);
   }
@@ -133,8 +139,8 @@ class GameMain extends FlameGame{
       },
       onTapAutoButton: (){},
       onTapSpeedButton: (){},
-      onTapBetButton: (bet){
-        _wheelComponent.updateBetNumber(bet);
+      onTapBetButton: (){
+        _wheelComponent.updateBetNumber();
       },
       onTapSettingButton: (){},
     );

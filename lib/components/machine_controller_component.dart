@@ -28,7 +28,7 @@ class MachineControllerComponent extends PositionComponent {
   final void Function() onTapSpinButton;
   final void Function() onTapAutoButton;
   final void Function() onTapSpeedButton;
-  final void Function(double bet) onTapBetButton;
+  final void Function() onTapBetButton;
   final void Function() onTapSettingButton;
 
 
@@ -93,6 +93,11 @@ class MachineControllerComponent extends PositionComponent {
   }
 
 
+  void updateWinAmount(double winAmount){
+    _winAmountText.text = winAmount.toStringAsFixed(2);
+    _global.balanceAmount += winAmount;
+    _balanceAmountText.text = _global.balanceAmount.toStringAsFixed(2);
+  }
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -164,6 +169,7 @@ class MachineControllerComponent extends PositionComponent {
       onTap: () {
         hideSettingMenu();
         hideBetMenu();
+        _winAmountText.text = _winAmount.toStringAsFixed(2);
         onTapSpinButton.call();
       }
     );
@@ -403,7 +409,7 @@ class MachineControllerComponent extends PositionComponent {
         _global.betAmount = int.parse(gridItems.text);
         _betAmount = _global.betAmount.toDouble();
         _betAmountText.text = gridItems.text;
-        onTapBetButton.call(_betAmount);
+        onTapBetButton.call();
       },
     );
     // _betMenu.isVisible = _isShowBetMenu;

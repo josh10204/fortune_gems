@@ -21,8 +21,9 @@ import 'package:fortune_gems/system/global.dart';
 
 
 class MachineComponent extends PositionComponent with TapCallbacks{
-  MachineComponent({required this.onCallBack}) : super(size: Vector2(1290, 2796),anchor: Anchor.topCenter);
-  final void Function(int ratio, int luckyRatio, double resultAmount) onCallBack;
+  MachineComponent({required this.onStartCallBack,required this.onStopCallBack}) : super(size: Vector2(1290, 2796),anchor: Anchor.topCenter);
+  final void Function() onStartCallBack;
+  final void Function(int ratio, int luckyRatio, double resultAmount) onStopCallBack;
 
   late Global _global;
   late SpriteComponent _machineFrame;
@@ -50,9 +51,10 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
 
   /// demo資料順序
-  int _currentDemoIndex = 1;
+  int _currentDemoIndex = 2;
   void startRollingMachine(){
     if(_global.gameStatus == GameStatus.idle){
+      onStartCallBack.call();
       _global.gameStatus = GameStatus.startSpin;
       _startRolling();
     }
@@ -156,7 +158,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     if(_isHasWinning){
       _global.gameStatus = GameStatus.openScoreBoard;
       _showRollerWinningSymbolAnimation();
-      onCallBack(_ratio, _luckyRatio,_playResultAmount);
+      onStopCallBack(_ratio, _luckyRatio,_playResultAmount);
     }else{
       _global.gameStatus = GameStatus.idle;
     }

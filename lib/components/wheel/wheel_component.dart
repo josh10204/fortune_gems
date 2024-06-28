@@ -31,7 +31,7 @@ class WheelComponent extends PositionComponent {
   late SpriteComponent _wheelFrame;
   late SpriteComponent _wheelSelectFrame;
   late SpriteComponent _wheelCenterLogo;
-  Function()? _onStopCallBack;
+  Function(double ratioAmount)? _onStopCallBack;
   // final List<WheelItemType> _wheelItemList = WheelItemType.values;
   List<WheelItem> _wheelItemList = [];
 
@@ -44,14 +44,16 @@ class WheelComponent extends PositionComponent {
   double _bounceRangeEndAngle = 0;
 
   late WheelItemType _stopWheelItemType;
+  double _stopRatioAmount = 0;
 
 
   Timer _waitUpdateTimer = Timer(1);
 
-  Future<void> startLottery({required int stopRatio ,required Function() onCallBack}) async {
+  Future<void> startLottery({required int stopRatio ,required Function(double ratioAmount) onCallBack}) async {
     _global.gameStatus = GameStatus.startWheel;
     _onStopCallBack = onCallBack;
     _rotateStatus = WheelRotateStatus.opening;
+
     _zoomEffect(
       onFadeOutComplete: () {
         priority = 4;
@@ -59,9 +61,8 @@ class WheelComponent extends PositionComponent {
       onFadeInComplete: () async {
         _showBackgroundComponent();
         _rotateStatus = WheelRotateStatus.starting;
-        // _stopWheelItemType =  stopRatio.toString().getWheelItemTypeFromRatio;
-        _stopWheelItemType =  WheelItemType.item1x;
-
+        _stopWheelItemType =  stopRatio.toString().getWheelItemTypeFromRatio;
+        _stopRatioAmount = _global.betAmount.toDouble()*_stopWheelItemType.ratio;
         _bounceRangeStartAngle = _stopWheelItemType.startAngle;
         _bounceRangeEndAngle = _stopWheelItemType.endAngle;
         await Future.delayed(const Duration(milliseconds: 500));
@@ -77,7 +78,8 @@ class WheelComponent extends PositionComponent {
 
   }
 
-  void updateBetNumber(double number){
+  void updateBetNumber(){
+    double number = _global.betAmount.toDouble();
     for(WheelItem item in _wheelItemList){
       item.updateBetNumber(number);
     }
@@ -243,7 +245,7 @@ class WheelComponent extends PositionComponent {
       },
       onFadeInComplete: () {
         _global.gameStatus = GameStatus.stopWheel;
-        _onStopCallBack?.call();
+        _onStopCallBack?.call(_stopRatioAmount);
       },
     );
     // _hideBackgroundComponent();

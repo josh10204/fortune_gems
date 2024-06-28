@@ -19,7 +19,10 @@ enum WinningType{
 }
 
 class WinningComponent extends PositionComponent {
-  WinningComponent({super.position,super.anchor,required this.onCallBack}) : super(size: Vector2(1290, 2796));
+  WinningComponent({super.position,super.anchor,required this.winningType,required this.scoreAmount, required this.onCallBack}) : super(size: Vector2(1290, 2796));
+
+  WinningType winningType;
+  double scoreAmount;
   final void Function() onCallBack;
 
   late TimerComponent _timerComponent;
@@ -39,7 +42,7 @@ class WinningComponent extends PositionComponent {
 
     int index = _currentWinningType.index;
     index++;
-    if(index < WinningType.values.length){
+    if(_currentWinningType != winningType){
       _currentWinningType = WinningType.values[index];
       _titleSpriteComponent.sprite =  await Sprite.load(_getTitleSpriteImageString());
       _subtitleSpriteComponent.sprite =  await Sprite.load(_getSubtitleSpriteImageString());
@@ -82,30 +85,19 @@ class WinningComponent extends PositionComponent {
   Future<void> onLoad() async {
     super.onLoad();
     _initBackgroundComponent();
-    _initScaleEffect();
     _initTitleSpriteComponent();
     _initSubtitleSpriteComponent();
     _initLeftBirdSpriteComponent();
     _initRightBirdSpriteComponent();
     _initAmountBasicComponent();
-    _showCoinParticleComponent();
     _initSpriteNumberComponent();
 
+
+    _startAnimation();
   }
   void _initBackgroundComponent() {
     _backgroundComponent = RectangleComponent(size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.black.withOpacity(0.5),);
     add(_backgroundComponent);
-  }
-
-  void _initScaleEffect(){
-    _scaleEffect = ScaleEffect.to(
-      Vector2(1.2,1.2),
-      EffectController(duration: 4, reverseDuration: 0.5,curve: Curves.easeInOut),
-      onComplete: (){
-        _nextLevelWin();
-      }
-    );
-    add(_scaleEffect);
   }
 
   Future<void> _initTitleSpriteComponent() async {
@@ -201,17 +193,39 @@ class WinningComponent extends PositionComponent {
 
 
     double positionY = localCenter.y;
-    _spriteNumberComponent =SpriteNumberComponent(
+    _spriteNumberComponent = SpriteNumberComponent(
       srcDirPath: 'icons/numbers/',
       anchor: Anchor.center,
       position: _amountBasicComponent.localCenter,
       initNum: 0
     );
     _spriteNumberComponent.priority = 3;
+    _spriteNumberComponent.position = _amountBasicComponent.localCenter;
     _amountBasicComponent.add(_spriteNumberComponent);
+  }
 
-    await Future.delayed(const Duration(milliseconds: 1000));
-    _spriteNumberComponent.tickTo(678905432);
+  Future<void> _startAnimation() async {
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    /// 每階 Big Win 放大動畫時間
+    double scaleDuration = 3;
+    _scaleEffect = ScaleEffect.to(
+        Vector2(1.2,1.2),
+        EffectController(duration: scaleDuration, reverseDuration: 0.5,curve: Curves.easeInOut),
+        onComplete: (){
+          _nextLevelWin();
+        }
+    );
+    add(_scaleEffect);
+
+    /// 計算數字跳動顯示總共要顯示幾秒( 每階放大動畫時間 x WinningType 第幾個)
+    int index = winningType.index;
+    int numberDuration = (scaleDuration * index).toInt();
+    _spriteNumberComponent.tickTo(scoreAmount, duration: Duration(seconds: numberDuration));
+
+    _showCoinParticleComponent();
+
   }
 
   void _showCoinParticleComponent(){

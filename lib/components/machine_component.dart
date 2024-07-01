@@ -54,18 +54,20 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   int _currentDemoIndex = 2;
   void startRollingMachine(){
     if(_global.gameStatus == GameStatus.idle){
-      onStartCallBack.call();
       _global.gameStatus = GameStatus.startSpin;
+      onStartCallBack.call();
       _startRolling();
     }
   }
 
   void autoRollingMachine(bool isEnable){}
 
+  void speedRollingMachine(bool isEnable){}
+
+
   Future<void> _startRolling() async {
     for(MachineRollerComponent machineRollerComponent in _rollers){
       machineRollerComponent.startRolling();
-      await Future.delayed(const Duration(milliseconds: 400));
     }
     _updateRollerSymbol();
   }
@@ -160,7 +162,9 @@ class MachineComponent extends PositionComponent with TapCallbacks{
       _showRollerWinningSymbolAnimation();
       onStopCallBack(_ratio, _luckyRatio,_playResultAmount);
     }else{
-      _global.gameStatus = GameStatus.idle;
+      await Future.delayed(const Duration(milliseconds: 500));
+      _global.gameStatus = GameStatus.stopSpin;
+      onStopCallBack(0, 0,0);
     }
   }
 
@@ -223,8 +227,8 @@ class MachineComponent extends PositionComponent with TapCallbacks{
         _secondMachineRollerComponent.showWinningSymbol(indexList:payLineType.secondRollerItemIndexList);
         _thirdMachineRollerComponent.showWinningSymbol(indexList:payLineType.thirdIRollerItemIndexList);
         await Future.delayed(const Duration(milliseconds: 2000));
-      }
 
+      }
     }
   }
 

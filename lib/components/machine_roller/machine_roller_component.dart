@@ -169,7 +169,7 @@ class MachineRollerComponent extends PositionComponent {
         _rollingOffsetSymbolsY(dy: dt * _rollingSpeed);
         break;
       case RollerStatus.decelerating:
-        if(_currentRollingSpeed >2000){
+        if(_currentRollingSpeed >2800){
           _currentRollingSpeed = _currentRollingSpeed-800;
           _rollingOffsetSymbolsY(dy:dt * _currentRollingSpeed);
         }else{

@@ -18,8 +18,8 @@ class SettingMenuComponent extends SpriteComponent  with HasVisibility {
 
   bool _isMute = false;
 
-  final String _soundIconPath  = 'icons/button_setting_sound.png';
-  final String _muteIconPath  = 'icons/button_setting_mute.png';
+  final String _soundIconPath  = 'icons/buttons/button_setting_sound.png';
+  final String _muteIconPath  = 'icons/buttons/button_setting_mute.png';
 
   @override
   Future<void> onLoad() async {
@@ -34,13 +34,13 @@ class SettingMenuComponent extends SpriteComponent  with HasVisibility {
 
   void _initSpinSettingButton(){
     double buttonWidth = 100;
-    double buttonHeight = 88;
+    double buttonHeight = 100;
     double positonX = localCenter.x - buttonWidth/2;
     double positonY = localCenter.y*0.4 - buttonHeight/2;
     _spinButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_setting_spin.png',
+      iconPath: 'icons/buttons/button_setting_spin.png',
       onTap: (){},
     );
     add(_spinButton);
@@ -53,14 +53,14 @@ class SettingMenuComponent extends SpriteComponent  with HasVisibility {
     _aboutButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_setting_about.png',
+      iconPath: 'icons/buttons/button_setting_about.png',
       onTap: (){},
     );
     add(_aboutButton);
   }
   void _initSoundSettingButton(){
-    double buttonWidth = 80;
-    double buttonHeight = 80;
+    double buttonWidth = 100;
+    double buttonHeight = 100;
     double positonX = localCenter.x - buttonWidth/2;
     double positonY = localCenter.y *1.6 - buttonHeight/2;
     _soundButton = IconButton(

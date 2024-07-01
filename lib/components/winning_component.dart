@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/number_sprite/number_sprite_component.dart';
 import 'package:fortune_gems/components/number_sprite/sprite_number_component.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
+import 'package:fortune_gems/system/global.dart';
 import 'package:fortune_gems/test_particle_component.dart';
 
 
@@ -25,6 +26,7 @@ class WinningComponent extends PositionComponent {
   double scoreAmount;
   final void Function() onCallBack;
 
+  late Global _global;
   late TimerComponent _timerComponent;
   late ScaleEffect _scaleEffect ;
   late RectangleComponent _backgroundComponent;
@@ -49,6 +51,7 @@ class WinningComponent extends PositionComponent {
       _scaleEffect.reset();
       add(_scaleEffect);
     }else{
+      _global.gameStatus = GameStatus.stopBigWinning;
       _scaleEffect.reset();
       onCallBack.call();
     }
@@ -84,6 +87,7 @@ class WinningComponent extends PositionComponent {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    _global = Global();
     _initBackgroundComponent();
     _initTitleSpriteComponent();
     _initSubtitleSpriteComponent();
@@ -208,6 +212,7 @@ class WinningComponent extends PositionComponent {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
+    _global.gameStatus = GameStatus.startBigWinning;
     /// 每階 Big Win 放大動畫時間
     double scaleDuration = 3;
     _scaleEffect = ScaleEffect.to(

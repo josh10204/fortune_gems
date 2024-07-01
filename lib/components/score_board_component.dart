@@ -171,7 +171,7 @@ class ScoreBoardComponent extends PositionComponent {
   Future<void> _showCommonScoreBoardEffect() async {
     _numberSpriteComponent.resetNumber(_totalScoreAmount);
     ScaleEffect scaleEffect = ScaleEffect.to(Vector2(1.2,1.2), EffectController(duration: 1,curve: Curves.elasticOut),);
-    MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, size.y/2), EffectController(duration: 1),);
+    MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, size.y/2), EffectController(duration: 0.3),);
     OpacityEffect opacityEffect = OpacityEffect.fadeOut(EffectController(duration: 1),);
     _rollerSymbol.add(scaleEffect);
     await Future.delayed(const Duration(seconds: 1));

@@ -26,11 +26,80 @@ class GameMain extends FlameGame{
   late WinningComponent _winningComponent;
   late ScoreBoardComponent _scoreBoardComponent;
 
+  int _autoCount = 10;
+
+  int _ratio = 0;
+  int _wheelRatio = 0;
+  double _wheelRatioAmount = 0;
+  double _scoreAmount = 0;
+  WinningType _winningType = WinningType.none;
 
   GameMain() : super(camera: CameraComponent.withFixedResolution(width: 1290, height:2796)) {
     // pauseWhenBackgrounded = false;
     // debugMode = true;
 
+  }
+
+  void _gameStatusProcess(){
+    switch(_global.gameStatus){
+      case GameStatus.startSpin:
+        _machineControllerComponent.updateWinAmount(0.00);
+        _machineControllerComponent.hideBetMenu();
+        _machineControllerComponent.hideSettingMenu();
+        break;
+      case GameStatus.openScoreBoard:
+        _showScoreBoardComponent(ratio: _ratio,luckyRatio: _wheelRatio,resultAmount: _scoreAmount);
+        break;
+      case GameStatus.openWheel:
+        _showWheelComponent(luckyRatio: _wheelRatio);
+        break;
+      case GameStatus.stopWheel:
+        _scoreBoardComponent.updateAdditionAmount(_wheelRatioAmount);
+        break;
+      case GameStatus.openBigWinning:
+        _showWinningEffectComponent(_winningType,_scoreAmount);
+        world.remove(_scoreBoardComponent);
+        break;
+
+      case GameStatus.stopSpin:
+        _global.gameStatus = GameStatus.idle;
+        _resetRoundRatio();
+        _checkAutoSpin();
+        break;
+      case GameStatus.stopBigWinning:
+        _global.gameStatus = GameStatus.idle;
+        _machineControllerComponent.updateWinAmount(_scoreAmount);
+        world.remove(_winningComponent);
+        _resetRoundRatio();
+        _checkAutoSpin();
+        break;
+      case GameStatus.stopScoreBoard :
+        _global.gameStatus = GameStatus.idle;
+        _machineControllerComponent.updateWinAmount(_scoreAmount);
+        world.remove(_scoreBoardComponent);
+        _resetRoundRatio();
+        _checkAutoSpin();
+        break;
+      default:
+        break;
+    }
+  }
+
+  void _resetRoundRatio(){
+    _ratio = 0;
+    _wheelRatio = 0;
+    _wheelRatioAmount = 0;
+    _scoreAmount = 0;
+    _winningType = WinningType.none;
+  }
+
+  void _checkAutoSpin(){
+    if(_global.autoSpinCount >= 0){
+      _machineComponent.startRollingMachine();
+      _machineControllerComponent.updateAutoCount();
+    }else{
+      _machineControllerComponent.updateAutoCount();
+    }
   }
 
   void _showScoreBoardComponent({required int ratio, required int luckyRatio, required double resultAmount})  {
@@ -43,31 +112,20 @@ class GameMain extends FlameGame{
         type: type,
         ratio: ratio,
         luckyRatio: luckyRatio,
-        scoreAmount: 100,
+        scoreAmount: resultAmount,
         onCallBack: (totalScoreAmount,winningType){
-          switch(_global.gameStatus){
-            case GameStatus.openWheel:
-              _showWheelComponent(luckyRatio: luckyRatio);
-              break;
-            case GameStatus.openBigWinning:
-              _showWinningEffectComponent(winningType,totalScoreAmount);
-              world.remove(_scoreBoardComponent);
-              break;
-            default:
-              _global.gameStatus = GameStatus.idle;
-              _machineControllerComponent.updateWinAmount(totalScoreAmount);
-              world.remove(_scoreBoardComponent);
-              break;
-          }
+          _scoreAmount = totalScoreAmount;
+          _winningType = winningType;
+          _gameStatusProcess();
         });
     _scoreBoardComponent.priority = 3;
     world.add(_scoreBoardComponent);
   }
 
-
   void _showWheelComponent({required int luckyRatio}){
     _wheelComponent.startLottery(stopRatio: luckyRatio, onCallBack: (ratioAmount){
-        _scoreBoardComponent.updateAdditionAmount(ratioAmount);
+      _wheelRatioAmount = ratioAmount;
+      _gameStatusProcess();
     });
   }
   void _showWinningEffectComponent(WinningType winningType,double scoreAmount,) {
@@ -77,11 +135,7 @@ class GameMain extends FlameGame{
         winningType: winningType,
         scoreAmount: scoreAmount,
         onCallBack: (){
-          _global.gameStatus = GameStatus.idle;
-          _winningComponent.priority = 0;
-          _machineControllerComponent.updateWinAmount(scoreAmount);
-
-          world.remove(_winningComponent);
+          _gameStatusProcess();
         }
     );
     _winningComponent.priority = 3;
@@ -118,13 +172,13 @@ class GameMain extends FlameGame{
   void _initMachineComponent()  {
     _machineComponent = MachineComponent(
         onStartCallBack: () {
-          _machineControllerComponent.updateWinAmount(0.00);
-          _machineControllerComponent.hideBetMenu();
-          _machineControllerComponent.hideSettingMenu();
+          _gameStatusProcess();
         },
         onStopCallBack: (ratio, luckyRatio, resultAmount) {
-          _showScoreBoardComponent(
-              ratio: ratio, luckyRatio: luckyRatio, resultAmount: resultAmount);
+          _ratio = ratio;
+          _wheelRatio = luckyRatio;
+          _scoreAmount = resultAmount;
+          _gameStatusProcess();
         });
     _machineComponent.priority = 2;
     world.add(_machineComponent);
@@ -137,8 +191,10 @@ class GameMain extends FlameGame{
       onTapSpinButton: (){
         _machineComponent.startRollingMachine();
       },
-      onTapAutoButton: (){},
-      onTapSpeedButton: (){},
+      onTapAutoButton: (isEnable){
+        _checkAutoSpin();
+      },
+      onTapSpeedButton: (isEnable){},
       onTapBetButton: (){
         _wheelComponent.updateBetNumber();
       },

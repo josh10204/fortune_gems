@@ -24,5 +24,5 @@ class Global{
   GameStatus gameStatus = GameStatus.idle;
   int betAmount = 100; //押注金額
   double balanceAmount = 0.00;//總分
-
+  int autoSpinCount = -1; //自動輪轉 -1 代表關閉
 }

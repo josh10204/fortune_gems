@@ -20,16 +20,16 @@ class MachineControllerComponent extends PositionComponent {
     super.anchor,
     super.position,
     required this.onTapSpinButton,
+    required this.onTapBetButton,
+    required this.onTapSettingButton,
     required this.onTapAutoButton,
     required this.onTapSpeedButton,
-    required this.onTapBetButton,
-    required this.onTapSettingButton
   }) : super(size: Vector2(1290, 2796));
   final void Function() onTapSpinButton;
-  final void Function() onTapAutoButton;
-  final void Function() onTapSpeedButton;
   final void Function() onTapBetButton;
   final void Function() onTapSettingButton;
+  final void Function(bool isEnable) onTapAutoButton;
+  final void Function(bool isEnable) onTapSpeedButton;
 
 
 
@@ -43,6 +43,8 @@ class MachineControllerComponent extends PositionComponent {
   GridItems _currentBetGridItems = Global().betAmount.toString().getGridItems;
   double _betAmount = Global().betAmount.toDouble();
 
+  final String _autoStartIconPath = 'icons/buttons/button_auto_start.png';
+  final String _autoStopIconPath = 'icons/buttons/button_auto_stop.png';
 
   late TextComponent _balanceTitleText;
   late TextComponent _balanceAmountText;
@@ -61,9 +63,12 @@ class MachineControllerComponent extends PositionComponent {
   late SettingMenuComponent _settingMenu;
 
 
+  final _defaultAutoCount = 9;
   bool _isShowSettingMenu = false;
   bool _isShowBetMenu = false;
   bool _isShowExtraMenu = false;
+  bool _isEnableAuto = false;
+  bool _isEnableSpeed = false;
 
 
 
@@ -97,8 +102,20 @@ class MachineControllerComponent extends PositionComponent {
       _global.balanceAmount += winAmount;
       _balanceAmountText.text = _global.balanceAmount.toStringAsFixed(2);
     }
-
   }
+  void updateAutoCount(){
+    String countString = _global.autoSpinCount.toString();
+    if(_global.autoSpinCount < 0){
+      _isEnableAuto = false;
+      _global.autoSpinCount = -1;
+      _autoButton.updateIconPath(_autoStartIconPath);
+      _autoButton.updateText('');
+    }else{
+      _autoButton.updateText(countString);
+      _global.autoSpinCount -= 1;
+    }
+  }
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -159,14 +176,15 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initSpinButton(){
-    double buttonWidth = 288;
-    double buttonHeight = 296;
+    double buttonWidth = 280;
+    double buttonHeight = 280;
     double positonX = localCenter.x-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _spinButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_spin.png',
+      iconPath: 'icons/buttons/button_spin.png',
+      backgroundImagePath: 'icons/buttons/button_spin_background.png',
       onTap: () {
         hideSettingMenu();
         hideBetMenu();
@@ -178,44 +196,74 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initAutoButton(){
-    double buttonWidth = 120;
-    double buttonHeight = 120;
-    double positonX = localCenter.x *1.4-buttonWidth/2;
-    double positonY = _bottomControllerCenterY-buttonHeight/2;
+
+    double buttonWidth = 150;
+    double buttonHeight = 150;
+    double positonX = localCenter.x * 1.4 - buttonWidth / 2;
+    double positonY = _bottomControllerCenterY - buttonHeight / 2;
     _autoButton = IconButton(
-      size: Vector2(buttonWidth, buttonHeight),
-      position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_auto.png',
-      onTap: (){
-        onTapAutoButton.call();
-      }
-    );
+        size: Vector2(buttonWidth, buttonHeight),
+        position: Vector2(positonX, positonY),
+        iconPath: _autoStartIconPath,
+        backgroundImagePath: 'icons/buttons/button_background.png',
+        onTap: () {
+          if(_global.gameStatus !=GameStatus.idle){
+            return;
+          }
+          if(_isEnableAuto){
+            _isEnableAuto = false;
+            _global.autoSpinCount = -1;
+            _autoButton.updateIconPath(_autoStartIconPath);
+            _autoButton.updateText('');
+          }else{
+            _isEnableAuto = true;
+            _global.autoSpinCount = _defaultAutoCount;
+            _autoButton.updateIconPath(_autoStopIconPath);
+            _autoButton.updateText(_defaultAutoCount.toString());
+          }
+          onTapAutoButton.call(_isEnableAuto);
+
+        });
     add(_autoButton);
   }
 
   void _initSpeedButton(){
-    double buttonWidth = 120;
-    double buttonHeight = 120;
+    String disableIconPath = 'icons/buttons/button_speed_disable.png';
+    String enableIconPath = 'icons/buttons/button_speed_enable.png';
+    double buttonWidth = 150;
+    double buttonHeight = 150;
     double positonX = localCenter.x *1.65-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _speedButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_speed_disable.png',
-      onTap: () => onTapSpeedButton.call(),
+      iconPath: disableIconPath,
+      backgroundImagePath: 'icons/buttons/button_background.png',
+      onTap: () {
+        if(_isEnableSpeed){
+          _isEnableSpeed = false;
+          _speedButton.updateIconPath(disableIconPath);
+        }else{
+          _isEnableSpeed = true;
+          _speedButton.updateIconPath(enableIconPath);
+        }
+
+        onTapSpeedButton.call(_isEnableSpeed);
+      },
     );
     add(_speedButton);
   }
 
   void _initBetButton(){
-    double buttonWidth = 120;
-    double buttonHeight = 120;
+    double buttonWidth = 150;
+    double buttonHeight = 150;
     double positonX = localCenter.x *0.6-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _betButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_bet.png',
+      iconPath: 'icons/buttons/button_bet.png',
+      backgroundImagePath: 'icons/buttons/button_background.png',
       onTap: () {
         if(_isShowBetMenu){
           hideBetMenu();
@@ -231,14 +279,15 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initSettingButton(){
-    double buttonWidth = 120;
-    double buttonHeight = 120;
+    double buttonWidth = 150;
+    double buttonHeight = 150;
     double positonX = localCenter.x *0.2-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _settingButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_setting.png',
+      iconPath: 'icons/buttons/button_setting.png',
+      backgroundImagePath: 'icons/buttons/button_background.png',
       onTap: (){
         if(_isShowSettingMenu){
           hideSettingMenu();

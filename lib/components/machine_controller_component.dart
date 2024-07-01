@@ -99,8 +99,8 @@ class MachineControllerComponent extends PositionComponent {
   void updateWinAmount(double winAmount){
     _winAmountText.text = winAmount.toStringAsFixed(2);
     if(winAmount>0){
-      _global.balanceAmount += winAmount;
-      _balanceAmountText.text = _global.balanceAmount.toStringAsFixed(2);
+      _balanceAmount += winAmount;
+      _balanceAmountText.text = _balanceAmount.toStringAsFixed(2);
     }
   }
   void updateAutoCount(){
@@ -120,7 +120,6 @@ class MachineControllerComponent extends PositionComponent {
   Future<void> onLoad() async {
     super.onLoad();
     _global = Global();
-    _balanceAmount = _global.balanceAmount;
     _currentBetGridItems = _global.betAmount.toString().getGridItems;
     _betAmount = _global.betAmount.toDouble();
     await _initBottomBackground();

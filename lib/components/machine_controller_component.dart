@@ -38,10 +38,10 @@ class MachineControllerComponent extends PositionComponent {
   final Color _textSubTitleColor = const Color.fromRGBO(255, 255, 255, 1);
 
   late Global _global;
-  double _balanceAmount = Global().balanceAmount;
-  double _winAmount = 0.00;
-  GridItems _currentBetGridItems = Global().betAmount.toString().getGridItems;
-  double _betAmount = Global().betAmount.toDouble();
+  final double _winAmount = 0;
+  double _balanceAmount = 0;
+  GridItems _currentBetGridItems = GridItems.item15;
+  double _betAmount = 1;
 
   final String _autoStartIconPath = 'icons/buttons/button_auto_start.png';
   final String _autoStopIconPath = 'icons/buttons/button_auto_stop.png';
@@ -120,6 +120,9 @@ class MachineControllerComponent extends PositionComponent {
   Future<void> onLoad() async {
     super.onLoad();
     _global = Global();
+    _balanceAmount = _global.balanceAmount;
+    _currentBetGridItems = _global.betAmount.toString().getGridItems;
+    _betAmount = _global.betAmount.toDouble();
     await _initBottomBackground();
     _initExtraButton();
     _initSpinButton();

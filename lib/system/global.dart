@@ -23,6 +23,9 @@ class Global{
 
   GameStatus gameStatus = GameStatus.idle;
   int betAmount = 100; //押注金額
-  // double balanceAmount = 0.00;//總分
-  int autoSpinCount = -1; //自動輪轉 -1 代表關閉
+  int autoSpinCount = 0; //自動輪轉 0 代表關閉
+  bool isEnableSpeedSpin = false; // 是否已開啟加速模式
+
+// double balanceAmount = 0.00;//總分
+
 }

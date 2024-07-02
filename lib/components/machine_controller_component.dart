@@ -104,15 +104,15 @@ class MachineControllerComponent extends PositionComponent {
     }
   }
   void updateAutoCount(){
-    String countString = _global.autoSpinCount.toString();
-    if(_global.autoSpinCount < 0){
+    if(_global.autoSpinCount == 0){
       _isEnableAuto = false;
-      _global.autoSpinCount = -1;
+      _global.autoSpinCount = 0;
       _autoButton.updateIconPath(_autoStartIconPath);
       _autoButton.updateText('');
     }else{
-      _autoButton.updateText(countString);
       _global.autoSpinCount -= 1;
+      String countString = _global.autoSpinCount.toString();
+      _autoButton.updateText(countString);
     }
   }
 
@@ -209,7 +209,7 @@ class MachineControllerComponent extends PositionComponent {
         iconPath: _autoStartIconPath,
         backgroundImagePath: 'icons/buttons/button_background.png',
         onTap: () {
-          if(_global.gameStatus !=GameStatus.idle){
+          if(_global.gameStatus !=GameStatus.idle && _isEnableAuto == false){
             return;
           }
           if(_isEnableAuto){
@@ -244,9 +244,11 @@ class MachineControllerComponent extends PositionComponent {
       onTap: () {
         if(_isEnableSpeed){
           _isEnableSpeed = false;
+          _global.isEnableSpeedSpin = false;
           _speedButton.updateIconPath(disableIconPath);
         }else{
           _isEnableSpeed = true;
+          _global.isEnableSpeedSpin = true;
           _speedButton.updateIconPath(enableIconPath);
         }
 

@@ -93,10 +93,12 @@ class GameMain extends FlameGame{
     _winningType = WinningType.none;
   }
 
-  void _checkAutoSpin(){
-    if(_global.autoSpinCount >= 0){
-      _machineComponent.startRollingMachine();
+  Future<void> _checkAutoSpin() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if(_global.autoSpinCount > 0){
       _machineControllerComponent.updateAutoCount();
+      _machineComponent.startRollingMachine();
     }else{
       _machineControllerComponent.updateAutoCount();
     }
@@ -192,7 +194,7 @@ class GameMain extends FlameGame{
         _machineComponent.startRollingMachine();
       },
       onTapAutoButton: (isEnable){
-        _checkAutoSpin();
+        _machineComponent.startRollingMachine();
       },
       onTapSpeedButton: (isEnable){},
       onTapBetButton: (){

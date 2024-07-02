@@ -147,13 +147,12 @@ class MachineComponent extends PositionComponent with TapCallbacks{
 
   Future<void> _stopRolling() async {
     _global.gameStatus = GameStatus.stopSpin;
-    _firstMachineRollerComponent.stopRolling();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _secondMachineRollerComponent.stopRolling();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _thirdMachineRollerComponent.stopRolling();
-    await Future.delayed(const Duration(milliseconds: 500));
-    _ratioMachineRollerComponent.stopRolling();
+    for(MachineRollerComponent roller in _rollers){
+      roller.stopRolling();
+      if(!_global.isEnableSpeedSpin){
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+    }
   }
 
   Future<void> _stopResult() async {

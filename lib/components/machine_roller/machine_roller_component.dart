@@ -5,6 +5,7 @@ import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/components/machine_roller/machine_roller_symbol.dart';
+import 'package:fortune_gems/system/global.dart';
 
 enum RollerType{
   common,
@@ -25,7 +26,7 @@ class MachineRollerComponent extends PositionComponent {
   final void Function() onStopCallBack;
 
   RollerType rollerType;
-
+  late Global _global;
   List<MachineRollerSymbol> _slotMachineRollerSymbolList = [];
   static const double _rollerHeight = 681.6;
   static const double _symbolHeight = 227.2;
@@ -73,7 +74,11 @@ class MachineRollerComponent extends PositionComponent {
   /// 停止滾動
   Future<void> stopRolling() async {
     if (_rollerState == RollerStatus.rolling) {
-      _rollerState = RollerStatus.decelerating;
+      if(_global.isEnableSpeedSpin){
+        _rollerState = RollerStatus.rebound;
+      }else{
+        _rollerState = RollerStatus.decelerating;
+      }
     }
   }
 
@@ -94,6 +99,7 @@ class MachineRollerComponent extends PositionComponent {
 
   @override
   void onLoad() async {
+    _global = Global();
     _initRollerSymbolList();
 
     if(rollerType == RollerType.ratio){

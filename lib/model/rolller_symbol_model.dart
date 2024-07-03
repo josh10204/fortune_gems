@@ -1,10 +1,11 @@
 
-// enum RollerSymbolType{
-//   common,
-//   addition,
-//   wild,
-//   wheel,
-// }
+class RollerSymbolModel{
+  RollerSymbolModel({
+    required this.type,
+  });
+  RollerSymbolType type;
+}
+
 
 enum RollerSymbolType{
   none(imagePath: '',unselectImagePath:''),
@@ -44,10 +45,3 @@ enum RollerPayLineType{
 
 }
 
-class RollerSymbolModel{
-
-  RollerSymbolModel({
-    required this.type,
-  });
-  RollerSymbolType type;
-}

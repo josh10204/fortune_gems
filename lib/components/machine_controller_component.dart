@@ -24,12 +24,14 @@ class MachineControllerComponent extends PositionComponent {
     required this.onTapSettingButton,
     required this.onTapAutoButton,
     required this.onTapSpeedButton,
+    required this.onTapExtraBetSwitch,
   }) : super(size: Vector2(1290, 2796));
   final void Function() onTapSpinButton;
   final void Function() onTapBetButton;
   final void Function() onTapSettingButton;
   final void Function(bool isEnable) onTapAutoButton;
   final void Function(bool isEnable) onTapSpeedButton;
+  final void Function(bool isEnable) onTapExtraBetSwitch;
 
 
 
@@ -70,8 +72,6 @@ class MachineControllerComponent extends PositionComponent {
   bool _isEnableAuto = false;
   bool _isEnableSpeed = false;
 
-
-
   void showBetMenu(){
     if(_global.gameStatus != GameStatus.idle) return;
     _isShowBetMenu = true;
@@ -96,6 +96,7 @@ class MachineControllerComponent extends PositionComponent {
     _isShowSettingMenu = false;
     remove(_settingMenu);
   }
+
   void updateWinAmount(double winAmount){
     _winAmountText.text = winAmount.toStringAsFixed(2);
     if(winAmount>0){
@@ -103,6 +104,7 @@ class MachineControllerComponent extends PositionComponent {
       _balanceAmountText.text = _balanceAmount.toStringAsFixed(2);
     }
   }
+
   void updateAutoCount(){
     if(_global.autoSpinCount == 0){
       _isEnableAuto = false;
@@ -430,7 +432,10 @@ class MachineControllerComponent extends PositionComponent {
     _extraMenu = ExtraMenuComponent(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX,positonY),
-      onTap: () {},
+      onTapSwitch: (isEnable) {
+        _global.isEnableExtraBet = isEnable;
+        onTapExtraBetSwitch.call(isEnable);
+      },
     );
     add(_extraMenu);
   }

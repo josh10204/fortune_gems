@@ -22,9 +22,10 @@ class Global{
   Global._init();
 
   GameStatus gameStatus = GameStatus.idle;
-  int betAmount = 100; //押注金額
-  int autoSpinCount = 0; //自動輪轉 0 代表關閉
+  int betAmount = 100; // 押注金額
+  int autoSpinCount = 0; // 自動輪轉 0 代表關閉
   bool isEnableSpeedSpin = false; // 是否已開啟加速模式
+  bool isEnableExtraBet = false; // 是否已開啟EX模式
 
 // double balanceAmount = 0.00;//總分
 

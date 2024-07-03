@@ -1,6 +1,6 @@
 import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
-import 'package:fortune_gems/components/wheel/wheel_item.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
+import 'package:fortune_gems/model/wheel_item_model.dart';
 
 extension StringExtension on String{
 

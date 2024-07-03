@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/wheel/wheel_item.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/extension/string_extension.dart';
+import 'package:fortune_gems/model/wheel_item_model.dart';
 import 'package:fortune_gems/system/global.dart';
 
 enum WheelRotateStatus {
@@ -56,7 +57,7 @@ class WheelComponent extends PositionComponent {
 
     _zoomEffect(
       onFadeOutComplete: () {
-        priority = 4;
+        priority = 5;
       },
       onFadeInComplete: () async {
         _showBackgroundComponent();
@@ -74,9 +75,7 @@ class WheelComponent extends PositionComponent {
     );
   }
 
-  Future<void> stopLottery() async {
-
-  }
+  Future<void> stopLottery() async {}
 
   void updateBetNumber(){
     double number = _global.betAmount.toDouble();
@@ -98,22 +97,22 @@ class WheelComponent extends PositionComponent {
   }
 
   void _initBasicWheel(){
-    _basicWheel = PositionComponent(size:Vector2(1020,1020),anchor: Anchor.center,position: localCenter,priority: 1);
+    _basicWheel = PositionComponent(size:Vector2(1142,1142),anchor: Anchor.center,position: localCenter,priority: 1);
     add(_basicWheel);
   }
 
   Future<void> _initWheel() async {
-    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1020,1020),priority: 1);
+    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1142,1142),priority: 1);
     _basicWheel.add(_wheel);
   }
 
   Future<void> _initWheelFrame() async {
-    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1020,1020),priority: 1);
+    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1142,1142),priority: 1);
     _basicWheel.add(_wheelFrame);
   }
 
   Future<void> _initWheelSelectFrame() async {
-    _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(382.5,685),position: Vector2(localCenter.x,localCenter.y-245),anchor: Anchor.center,priority: 3);
+    _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(397.8,712.4),position: Vector2(localCenter.x,localCenter.y-290),anchor: Anchor.center,priority: 3);
     add(_wheelSelectFrame);
   }
 

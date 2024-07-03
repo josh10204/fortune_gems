@@ -10,8 +10,8 @@ import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 
 class ExtraMenuComponent extends PositionComponent  with HasVisibility{
-  ExtraMenuComponent({super.position,super.size,required this.onTap}) : super();
-  final void Function() onTap;
+  ExtraMenuComponent({super.position,super.size,required this.onTapSwitch}) : super();
+  final void Function(bool isEnable) onTapSwitch;
 
 
   late PositionComponent _basicView;
@@ -97,11 +97,13 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
       onTap: (){
         if(_isOnExtra){
           _isOnExtra = false;
-          _switchButton.updateIconPath(_onIconPath);
+          _switchButton.updateIconPath(_offIconPath);
         }else{
           _isOnExtra = true;
-          _switchButton.updateIconPath(_offIconPath);
+          _switchButton.updateIconPath(_onIconPath);
         }
+
+        onTapSwitch.call(_isOnExtra);
       },
     );
     _switchButton.priority = 1;

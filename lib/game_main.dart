@@ -3,13 +3,13 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/particles.dart';
+import 'package:fortune_gems/components/extra_bet_enable_effect_component.dart';
 import 'package:fortune_gems/components/header_component.dart';
 import 'package:fortune_gems/components/machine_component.dart';
 import 'package:fortune_gems/components/machine_controller_component.dart';
 import 'package:fortune_gems/components/score_board_component.dart';
 import 'package:fortune_gems/components/wheel/wheel_component.dart';
 import 'package:fortune_gems/components/winning_component.dart';
-import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/system/global.dart';
 
 
@@ -25,7 +25,7 @@ class GameMain extends FlameGame{
   late MachineControllerComponent _machineControllerComponent;
   late WinningComponent _winningComponent;
   late ScoreBoardComponent _scoreBoardComponent;
-
+  late ExtraBetEnableEffectComponent _extraBetEnableEffectComponent;
   int _autoCount = 10;
 
   int _ratio = 0;
@@ -60,7 +60,6 @@ class GameMain extends FlameGame{
         _showWinningEffectComponent(_winningType,_scoreAmount);
         world.remove(_scoreBoardComponent);
         break;
-
       case GameStatus.stopSpin:
         _global.gameStatus = GameStatus.idle;
         _resetRoundRatio();
@@ -120,7 +119,7 @@ class GameMain extends FlameGame{
           _winningType = winningType;
           _gameStatusProcess();
         });
-    _scoreBoardComponent.priority = 3;
+    _scoreBoardComponent.priority = 4;
     world.add(_scoreBoardComponent);
   }
 
@@ -130,6 +129,7 @@ class GameMain extends FlameGame{
       _gameStatusProcess();
     });
   }
+
   void _showWinningEffectComponent(WinningType winningType,double scoreAmount,) {
     _winningComponent = WinningComponent(
         anchor: Anchor.center,
@@ -140,8 +140,17 @@ class GameMain extends FlameGame{
           _gameStatusProcess();
         }
     );
-    _winningComponent.priority = 3;
+    _winningComponent.priority = 4;
     world.add(_winningComponent);
+  }
+
+  Future<void> _showExtraBetEnableEffectComponent() async {
+
+    _extraBetEnableEffectComponent = ExtraBetEnableEffectComponent( anchor: Anchor.center,onFinishCallBack: (){
+      world.remove(_extraBetEnableEffectComponent);
+    });
+    _extraBetEnableEffectComponent.priority = 4;
+    world.add(_extraBetEnableEffectComponent);
   }
 
   @override
@@ -157,7 +166,7 @@ class GameMain extends FlameGame{
   void _initHeaderComponents(){
 
     _headerComponent = HeaderComponent();
-    _headerComponent.priority = 0;
+    _headerComponent.priority = 1;
     world.add(_headerComponent);
 
   }
@@ -166,10 +175,9 @@ class GameMain extends FlameGame{
     _wheelComponent = WheelComponent(
         anchor: Anchor.center,
         position: Vector2.zero(),);
-    _wheelComponent.priority = 1;
+    _wheelComponent.priority = 2;
     world.add(_wheelComponent);
   }
-
 
   void _initMachineComponent()  {
     _machineComponent = MachineComponent(
@@ -182,7 +190,7 @@ class GameMain extends FlameGame{
           _scoreAmount = resultAmount;
           _gameStatusProcess();
         });
-    _machineComponent.priority = 2;
+    _machineComponent.priority = 3;
     world.add(_machineComponent);
   }
 
@@ -196,16 +204,20 @@ class GameMain extends FlameGame{
       onTapAutoButton: (isEnable){
         _machineComponent.startRollingMachine();
       },
-      onTapSpeedButton: (isEnable){},
       onTapBetButton: (){
         _wheelComponent.updateBetNumber();
       },
+      onTapExtraBetSwitch:(isEnable){
+        if(isEnable){
+          _showExtraBetEnableEffectComponent();
+        }
+      },
+      onTapSpeedButton: (isEnable){},
       onTapSettingButton: (){},
     );
-    _machineControllerComponent.priority = 3;
+    _machineControllerComponent.priority = 4;
     world.add(_machineControllerComponent);
   }
-
 
 
 }

@@ -26,7 +26,6 @@ class GameMain extends FlameGame{
   late WinningComponent _winningComponent;
   late ScoreBoardComponent _scoreBoardComponent;
   late ExtraBetEnableEffectComponent _extraBetEnableEffectComponent;
-  int _autoCount = 10;
 
   int _ratio = 0;
   int _wheelRatio = 0;

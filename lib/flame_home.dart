@@ -12,9 +12,11 @@ class FlameHome extends StatefulWidget {
 class _FlameHomeState extends State<FlameHome> {
 
 
+  late GameWidget _gameWidget;
+
   @override
   Widget build(BuildContext context) {
-    return GameWidget(
+    _gameWidget = GameWidget(
       game: GameMain(),
       backgroundBuilder: (context) {
         //這是目前試驗出來真正可以直接佔滿全銀幕不變形的方法。
@@ -29,5 +31,6 @@ class _FlameHomeState extends State<FlameHome> {
         );
       },
     );
+    return _gameWidget;
   }
 }

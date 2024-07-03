@@ -1,11 +1,14 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/components/machine_roller/machine_roller_symbol.dart';
 import 'package:fortune_gems/system/global.dart';
+import 'package:fortune_gems/system/mode_event.dart';
 
 enum RollerType{
   common,
@@ -27,6 +30,7 @@ class MachineRollerComponent extends PositionComponent {
 
   RollerType rollerType;
   late Global _global;
+
   List<MachineRollerSymbol> _slotMachineRollerSymbolList = [];
   static const double _rollerHeight = 681.6;
   static const double _symbolHeight = 227.2;
@@ -39,6 +43,7 @@ class MachineRollerComponent extends PositionComponent {
   final List<String> _blockList = ['W','H1','H2','H3','N1','N2','N3','N4'];
   final List<String> _ratioList = ['0','1','2','3','5','10','15'];
 
+  late SpriteComponent _extraIconSpriteComponent ;
 
   /// 取得目前滾動狀態
   RollerStatus get currentState {
@@ -55,11 +60,22 @@ class MachineRollerComponent extends PositionComponent {
     }
   }
 
+  /// 停止滾動
+  Future<void> stopRolling() async {
+    if (_rollerState == RollerStatus.rolling) {
+      if(_global.isEnableSpeedSpin){
+        _rollerState = RollerStatus.rebound;
+      }else{
+        _rollerState = RollerStatus.decelerating;
+      }
+    }
+  }
+
   /// 更新內容
   Future<void> updateRollerSymbolList({required List<RollerSymbolModel> modelList}) async {
     List<RollerSymbolModel> list = modelList;
     /// 倍率的輪盤，補齊剩餘兩個隨機顯示的內容
-    if(rollerType == RollerType.ratio){
+    if(rollerType == RollerType.ratio && modelList.length <3){
       list = _getRandomRollerSymbolList(list: _ratioList,total:2);
       list.insert(1, modelList[0]);
     }
@@ -71,15 +87,27 @@ class MachineRollerComponent extends PositionComponent {
     }
   }
 
-  /// 停止滾動
-  Future<void> stopRolling() async {
-    if (_rollerState == RollerStatus.rolling) {
-      if(_global.isEnableSpeedSpin){
-        _rollerState = RollerStatus.rebound;
-      }else{
-        _rollerState = RollerStatus.decelerating;
-      }
+  Future<void> updateExtraIcon({required isShow}) async {
+    if(isShow){
+      _extraIconSpriteComponent = SpriteComponent(
+          sprite: await Sprite.load('icons/button_extra.png'),
+          anchor: Anchor.center,
+          size: Vector2(87, 66),
+
+        position: Vector2(40, _symbolHeight * 1.5),
+      );
+      add(_extraIconSpriteComponent);
+    }else{
+
+      ScaleEffect scaleEffect = ScaleEffect.to(Vector2(0, 0), EffectController(duration: 1,curve: Curves.elasticIn),onComplete: (){
+        remove(_extraIconSpriteComponent);
+      });
+      _extraIconSpriteComponent.add(scaleEffect);
+
+
     }
+
+
   }
 
   void showWinningSymbol({required List<int> indexList}){
@@ -93,8 +121,6 @@ class MachineRollerComponent extends PositionComponent {
       }
     }
   }
-
-
 
 
   @override
@@ -111,7 +137,7 @@ class MachineRollerComponent extends PositionComponent {
 
   Future<void> _initSelectFrame() async {
 
-    add(SpriteComponent(sprite: await Sprite.load('images/machine_select_frame.png'),size: Vector2(324.8,268.8),position: Vector2(-1-0,_symbolHeight-10)));
+    add(SpriteComponent(sprite: await Sprite.load('images/machine_select_frame.png'),size: Vector2(324.8,268.8),position: Vector2(-1,_symbolHeight-10)));
   }
 
   void _initRollerSymbolList(){

@@ -17,6 +17,7 @@ import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/model/slot_game_model.dart';
 import 'package:fortune_gems/system/global.dart';
+import 'package:fortune_gems/system/mode_event.dart';
 
 
 
@@ -26,6 +27,8 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   final void Function(int ratio, int luckyRatio, double resultAmount) onStopCallBack;
 
   late Global _global;
+  late ModeEvent _modeEvent;
+
   late SpriteComponent _machineFrame;
   late MachineBannerComponent _machineBanner;
   late MachineRollerComponent _firstMachineRollerComponent;
@@ -59,11 +62,6 @@ class MachineComponent extends PositionComponent with TapCallbacks{
       _startRolling();
     }
   }
-
-  void autoRollingMachine(bool isEnable){}
-
-  void speedRollingMachine(bool isEnable){}
-
 
   Future<void> _startRolling() async {
     for(MachineRollerComponent machineRollerComponent in _rollers){
@@ -184,6 +182,11 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   @override
   Future<void> onLoad() async {
     _global = Global();
+    _modeEvent = ModeEvent();
+    _modeEvent.add(ModeEventType.extraBet, (arg){
+      _enableExtraBetMode();
+      print('Josh ModeEvent1');
+    });
     _machineFrame = SpriteComponent(sprite: await Sprite.load('images/machine_background.png'),size: Vector2(1614,1025),position:Vector2(-162,0));
     add(_machineFrame);
     _intiMachineRollerComponent();
@@ -231,6 +234,19 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     }
   }
 
+  void _enableExtraBetMode(){
+
+    /// 在切換ExtraBet，設定倍率的輪盤預設初始樣式
+    List<String> ratioList = ['3','10','0'];
+    if(_global.isEnableExtraBet){
+      ratioList = ['10','15','0'];
+    }
+    List<RollerSymbolModel> ratioModelList = _getRollerSymbolModelList(symbolList: ratioList,allResultList:[]);
+    _ratioMachineRollerComponent.updateRollerSymbolList(modelList: ratioModelList);
+    _ratioMachineRollerComponent.updateExtraIcon(isShow: _global.isEnableExtraBet);
+
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -241,6 +257,7 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     super.render(canvas);
 
   }
+
 
   @override
   void onTapDown(TapDownEvent event) {

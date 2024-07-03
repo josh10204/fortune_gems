@@ -7,12 +7,14 @@ import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
+import 'package:fortune_gems/system/global.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 
 class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   ExtraMenuComponent({super.position,super.size,required this.onTapSwitch}) : super();
   final void Function(bool isEnable) onTapSwitch;
 
+  late Global _global;
 
   late PositionComponent _basicView;
   late SpriteComponent _menuBar;
@@ -43,6 +45,8 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    _global = Global();
+
     _initBasic();
     _initMenuBar();
     _initTitleText();
@@ -95,6 +99,9 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
       position: Vector2(positonX, positonY),
       iconPath: _offIconPath,
       onTap: (){
+        if(_global.gameStatus !=GameStatus.idle){
+          return;
+        }
         if(_isOnExtra){
           _isOnExtra = false;
           _switchButton.updateIconPath(_offIconPath);

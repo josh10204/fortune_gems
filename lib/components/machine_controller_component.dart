@@ -9,6 +9,7 @@ import 'package:flame/particles.dart';
 import 'package:flame/text.dart';
 import 'package:fortune_gems/extension/string_extension.dart';
 import 'package:fortune_gems/system/global.dart';
+import 'package:fortune_gems/system/mode_event.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/components/extra_menu_component.dart';
@@ -40,6 +41,7 @@ class MachineControllerComponent extends PositionComponent {
   final Color _textSubTitleColor = const Color.fromRGBO(255, 255, 255, 1);
 
   late Global _global;
+  late ModeEvent _modeEvent;
   final double _winAmount = 0;
   double _balanceAmount = 0;
   GridItems _currentBetGridItems = GridItems.item15;
@@ -122,6 +124,7 @@ class MachineControllerComponent extends PositionComponent {
   Future<void> onLoad() async {
     super.onLoad();
     _global = Global();
+    _modeEvent = ModeEvent();
     _currentBetGridItems = _global.betAmount.toString().getGridItems;
     _betAmount = _global.betAmount.toDouble();
     await _initBottomBackground();
@@ -411,7 +414,7 @@ class MachineControllerComponent extends PositionComponent {
     double positonX = _betButton.position.x + 80;
     double positonY = _betButton.position.y + _betButton.size.y ;
     _betAmountText = TextComponent(
-      text:_betAmount.toString(),
+      text:_betAmount.toStringAsFixed(1),
       textRenderer: TextPaint(
         style: TextStyle(
           fontSize: fontSize,
@@ -434,6 +437,7 @@ class MachineControllerComponent extends PositionComponent {
       position: Vector2(positonX,positonY),
       onTapSwitch: (isEnable) {
         _global.isEnableExtraBet = isEnable;
+        _updateExtraModeDate();
         onTapExtraBetSwitch.call(isEnable);
       },
     );
@@ -465,14 +469,28 @@ class MachineControllerComponent extends PositionComponent {
       defaultGridItems: _currentBetGridItems,
       onSelectCallBack: (gridItems) {
         _currentBetGridItems = gridItems;
-        _global.betAmount = int.parse(gridItems.text);
+        double bet = double.parse(gridItems.text);
+        if(_global.isEnableExtraBet){
+          bet = bet * _global.extraBetRatio;
+        }
+        _global.betAmount = bet;
         _betAmount = _global.betAmount.toDouble();
-        _betAmountText.text = gridItems.text;
+        _betAmountText.text = _global.betAmount.toStringAsFixed(1);
         onTapBetButton.call();
       },
     );
     // _betMenu.isVisible = _isShowBetMenu;
     add(_betMenu);
+  }
+
+  void _updateExtraModeDate(){
+    if(_global.isEnableExtraBet){
+      _global.betAmount = _global.betAmount *_global.extraBetRatio;
+    }else{
+      _global.betAmount = _global.betAmount /_global.extraBetRatio;
+    }
+    _betAmountText.text = _global.betAmount.toString();
+    _modeEvent.send(ModeEventType.extraBet, []);
   }
 
 }

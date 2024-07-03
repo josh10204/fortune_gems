@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
+import 'package:fortune_gems/system/global.dart';
 
 class GridMenuItem extends PositionComponent  with TapCallbacks {
   GridMenuItem({super.position,required this.gridItems,required this.isSelectItem, required this.onTap}) : super();
   final void Function(GridItems) onTap;
   final GridItems gridItems;
+  late Global _global;
 
   bool isSelectItem;
   late RectangleComponent _backgroundComponent;
@@ -31,14 +33,20 @@ class GridMenuItem extends PositionComponent  with TapCallbacks {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    _global = Global();
     size = Vector2(210, 120);
     _initSelectBackground();
     _initText();
   }
 
   void _initText(){
+    double bet = double.parse(gridItems.text);
+    if(_global.isEnableExtraBet){
+      bet = bet*_global.extraBetRatio;
+    }
+
     _textComponent = TextComponent(
-      text:gridItems.text,
+      text:bet.toString(),
       textRenderer: TextPaint(
         style: TextStyle(
           fontSize: 48.0,

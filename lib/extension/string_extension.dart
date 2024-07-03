@@ -1,6 +1,7 @@
 import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/model/wheel_item_model.dart';
+import 'package:fortune_gems/system/global.dart';
 
 extension StringExtension on String{
 
@@ -15,13 +16,18 @@ extension StringExtension on String{
         case 'N2': return RollerSymbolType.blockK;
         case 'N3': return RollerSymbolType.blockQ;
         case 'N4': return RollerSymbolType.blockJ;
-        case '0': return RollerSymbolType.wheel;
         case '1': return RollerSymbolType.ratio1x;
         case '2': return RollerSymbolType.ratio2x;
         case '3': return RollerSymbolType.ratio3x;
         case '5': return RollerSymbolType.ratio5x;
         case '10': return RollerSymbolType.ratio10x;
         case '15': return RollerSymbolType.ratio15x;
+        case '0':
+          if(Global().isEnableExtraBet){
+            return  RollerSymbolType.wheelEX;
+          }else{
+            return RollerSymbolType.wheel;
+          }
       }
       return RollerSymbolType.none;
     }catch(e){

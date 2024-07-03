@@ -1,6 +1,5 @@
 
 import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/extensions.dart';
@@ -9,11 +8,11 @@ import 'package:fortune_gems/model/wheel_item_model.dart';
 
 class WheelItem extends PositionComponent {
   WheelItem({required this.type,required this.betAmount,required this.basicCenter}) : super(size: Vector2(100, 50));
+  late NumberSpriteComponent _numberSpriteComponent ;
 
   WheelItemType type;
-  int betAmount;
+  double betAmount;
   Vector2 basicCenter;
-  late NumberSpriteComponent _numberSpriteComponent ;
 
 
   void closeEffect(){

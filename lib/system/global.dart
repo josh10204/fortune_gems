@@ -22,7 +22,8 @@ class Global{
   Global._init();
 
   GameStatus gameStatus = GameStatus.idle;
-  int betAmount = 100; // 押注金額
+  double extraBetRatio = 1.5; // Ex模式 押注金額為原先的1.5倍
+  double betAmount = 100; // 押注金額
   int autoSpinCount = 0; // 自動輪轉 0 代表關閉
   bool isEnableSpeedSpin = false; // 是否已開啟加速模式
   bool isEnableExtraBet = false; // 是否已開啟EX模式

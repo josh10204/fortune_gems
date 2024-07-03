@@ -6,15 +6,22 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/components/grid_menu/grid_menu_item.dart';
 
+import '../../system/global.dart';
+
 class GridTextMenuComponent extends SpriteComponent  with HasVisibility{
   GridTextMenuComponent({super.position,super.size,required this.defaultGridItems, required this.onSelectCallBack}) : super();
   final void Function(GridItems gridItems) onSelectCallBack;
   GridItems defaultGridItems;
+  late Global _global;
 
   List<GridMenuItem> _gridMenuButtonList = [];
   late GridMenuItem _currentGridItem;
   GridItems? _currentGridItems;
 
+  void updatetGridItems(){
+    removeAll(_gridMenuButtonList);
+    _initGridItem();
+  }
 
   void _selectGridItems(GridItems items){
     List<GridMenuItem> buttonList = _gridMenuButtonList.where((button) => button.gridItems.serial == items.serial).toList() ;
@@ -29,6 +36,7 @@ class GridTextMenuComponent extends SpriteComponent  with HasVisibility{
   }
   @override
   Future<void> onLoad() async {
+    _global = Global();
     sprite = await Sprite.load('images/bet_menu_background.png');
     _currentGridItems = defaultGridItems;
     _initGridItem();
@@ -50,9 +58,8 @@ class GridTextMenuComponent extends SpriteComponent  with HasVisibility{
       );
       if(isSelect) _currentGridItem = button;
       _gridMenuButtonList.add(button);
-      add(button);
     }
-    // addAll(_raiseMenuButtonList);
+    addAll(_gridMenuButtonList);
   }
 
   @override
@@ -63,9 +70,7 @@ class GridTextMenuComponent extends SpriteComponent  with HasVisibility{
   @override
   void render(Canvas canvas){
     super.render(canvas);
-
   }
-
 }
 
 enum GridItems{

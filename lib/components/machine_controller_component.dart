@@ -219,7 +219,7 @@ class MachineControllerComponent extends PositionComponent {
           }
           if(_isEnableAuto){
             _isEnableAuto = false;
-            _global.autoSpinCount = -1;
+            _global.autoSpinCount = 0;
             _autoButton.updateIconPath(_autoStartIconPath);
             _autoButton.updateText('');
           }else{
@@ -476,6 +476,7 @@ class MachineControllerComponent extends PositionComponent {
         _global.betAmount = bet;
         _betAmount = _global.betAmount.toDouble();
         _betAmountText.text = _global.betAmount.toStringAsFixed(1);
+        hideBetMenu();
         onTapBetButton.call();
       },
     );

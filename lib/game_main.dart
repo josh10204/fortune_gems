@@ -210,6 +210,8 @@ class GameMain extends FlameGame{
         if(isEnable){
           _showExtraBetEnableEffectComponent();
         }
+        _wheelComponent.updateBetNumber();
+
       },
       onTapSpeedButton: (isEnable){},
       onTapSettingButton: (){},

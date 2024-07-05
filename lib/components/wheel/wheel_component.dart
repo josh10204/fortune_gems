@@ -15,7 +15,6 @@ enum WheelRotateStatus {
   starting,
   speedUp,
   decelerating,
-  bounce,
   stopping,
   stopped,
   still,
@@ -36,15 +35,16 @@ class WheelComponent extends PositionComponent {
   // final List<WheelItemType> _wheelItemList = WheelItemType.values;
   List<WheelItem> _wheelItemList = [];
 
-  static const double _rotationLowSpeedAngle = 0.3 * 3.14 / 180;
-  static const double _rotationHighSpeedAngle = 45 * 3.14 / 180;
+  static const double _rotationLowSpeedAngle = 0.15 * 3.14 / 180;
+  static const double _rotationHighSpeedRatio = 25;
+  static const double _rotationHighSpeedAngle = _rotationHighSpeedRatio * 3.14 / 180;
+  double _rotationSpeedRatio= 0.1;
   double _currentRollingSpeedAngle = _rotationHighSpeedAngle;
-
-  bool _isBounceForward = false;
-  double _bounceRangeStartAngle = 0;
-  double _bounceRangeEndAngle = 0;
-
+  bool _isPassedDecelerateLine = false;
   late WheelItemType _stopWheelItemType;
+
+  late WheelItemType _decelerateWheelItemType;
+
   double _stopRatioAmount = 0;
 
 
@@ -64,11 +64,11 @@ class WheelComponent extends PositionComponent {
         _rotateStatus = WheelRotateStatus.starting;
         _stopWheelItemType =  stopRatio.toString().getWheelItemTypeFromRatio;
         _stopRatioAmount = _global.betAmount.toDouble()*_stopWheelItemType.ratio;
-        _bounceRangeStartAngle = _stopWheelItemType.startAngle;
-        _bounceRangeEndAngle = _stopWheelItemType.endAngle;
+        int index = WheelItemType.values.indexOf(_stopWheelItemType);
+        _decelerateWheelItemType = WheelItemType.values[(index+3)% WheelItemType.values.length];
         await Future.delayed(const Duration(milliseconds: 500));
         _rotateStatus = WheelRotateStatus.speedUp;
-        await Future.delayed(const Duration(seconds: 1));
+        await Future.delayed(const Duration(seconds: 5));
         _rotateStatus = WheelRotateStatus.decelerating;
         await Future.delayed(const Duration(seconds: 1));
       },
@@ -144,22 +144,23 @@ class WheelComponent extends PositionComponent {
         _rotationOffsetAngle(angle: _rotationLowSpeedAngle);
         break;
       case WheelRotateStatus.speedUp:
-        _rotationOffsetAngle(angle: _rotationHighSpeedAngle);
+
+        _currentRollingSpeedAngle = _rotationSpeedRatio * 3.14 / 180;
+        if(_currentRollingSpeedAngle < _rotationHighSpeedAngle){
+          _rotationSpeedRatio += 0.1;
+          _rotationOffsetAngle(angle: _currentRollingSpeedAngle);
+        }else{
+          _currentRollingSpeedAngle = _rotationHighSpeedAngle;
+          _rotationOffsetAngle(angle:_rotationHighSpeedAngle);
+        }
         break;
       case WheelRotateStatus.decelerating:
-        if(_currentRollingSpeedAngle > 0.3){
-          _currentRollingSpeedAngle -=0.06;
+        if(_currentRollingSpeedAngle >0.2){
+          _rotationSpeedRatio -= 0.1;
+          _currentRollingSpeedAngle = _rotationSpeedRatio * 3.14 / 180;
           _rotationOffsetAngle(angle: _currentRollingSpeedAngle);
         }else{
           _decelerateOffsetAngle(angle: _currentRollingSpeedAngle);
-        }
-        break;
-      case WheelRotateStatus.bounce:
-        double bounceOffset = (_bounceRangeEndAngle-_bounceRangeStartAngle) *0.4;
-        if (_isBounceForward) {
-          _bounceForwardOffsetAngle(angle: bounceOffset);
-        } else {
-          _bounceBackOffsetAngle(angle: bounceOffset);
         }
         break;
       case WheelRotateStatus.stopping:
@@ -182,46 +183,26 @@ class WheelComponent extends PositionComponent {
   }
 
   void _decelerateOffsetAngle({required double angle}){
-    if(_basicWheel.angle >= _bounceRangeStartAngle && _basicWheel.angle <= _bounceRangeEndAngle){
-      _rotateStatus  =  WheelRotateStatus.bounce;
-      if(_basicWheel.angle >=_bounceRangeEndAngle){
-        _isBounceForward = false;
-      }else{
-        _isBounceForward = true;
+    if (_isPassedDecelerateLine == false) {
+
+      if (_basicWheel.angle > _decelerateWheelItemType.centerAngle && _basicWheel.angle <= _decelerateWheelItemType.endAngle) {
+        _isPassedDecelerateLine = true;
       }
-    }else{
       _rotationOffsetAngle(angle: _currentRollingSpeedAngle);
-    }
-  }
-  void _bounceForwardOffsetAngle({required double angle}){
-    if(_basicWheel.angle >= _bounceRangeEndAngle){
-      _bounceRangeStartAngle += 0.04;
-      _bounceRangeEndAngle -= 0.04;
-      _isBounceForward = false;
-      if(_bounceRangeStartAngle >= _stopWheelItemType.centerAngle ||
-          _bounceRangeEndAngle <= _stopWheelItemType.centerAngle){
-        _rotateStatus  =  WheelRotateStatus.stopping;
+    } else {
+      if (_basicWheel.angle < _stopWheelItemType.centerAngle+0.02 && _basicWheel.angle >= _stopWheelItemType.centerAngle -0.02) {
+        _rotateStatus = WheelRotateStatus.stopping;
+      } else {
+        if (_currentRollingSpeedAngle > 0.1) {
+          _currentRollingSpeedAngle -= 0.005;
+        }else if(_currentRollingSpeedAngle > 0.03 && _currentRollingSpeedAngle < 0.1){
+          _currentRollingSpeedAngle -= 0.0015;
+        }else{
+          _currentRollingSpeedAngle = 0.03;
+        }
+        _rotationOffsetAngle(angle: _currentRollingSpeedAngle);
       }
-    }else{
-      _basicWheel.angle += angle;
-
     }
-  }
-
-  void _bounceBackOffsetAngle({required double angle}){
-    if(_basicWheel.angle <= _bounceRangeStartAngle){
-      _bounceRangeStartAngle += 0.04;
-      _bounceRangeEndAngle -= 0.04;
-      _isBounceForward = true;
-      if(_bounceRangeStartAngle >= _stopWheelItemType.centerAngle ||
-          _bounceRangeEndAngle <= _stopWheelItemType.centerAngle){
-        _rotateStatus  =  WheelRotateStatus.stopping;
-      }
-    }else{
-      _basicWheel.angle -= angle;
-
-    }
-
   }
 
   Future<void> _stoppingOffsetAngle({required double dt})  async {
@@ -236,7 +217,7 @@ class WheelComponent extends PositionComponent {
   void _stopped()  {
     _rotateStatus = WheelRotateStatus.starting;
     _currentRollingSpeedAngle = _rotationHighSpeedAngle;
-    _isBounceForward = true;
+    _isPassedDecelerateLine = false;
     _hideBackgroundComponent();
     _zoomEffect(
       onFadeOutComplete: () {

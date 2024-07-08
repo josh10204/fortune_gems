@@ -22,14 +22,14 @@ import 'package:fortune_gems/system/mode_event.dart';
 
 
 class MachineComponent extends PositionComponent with TapCallbacks{
-  MachineComponent({required this.onStartCallBack,required this.onStopCallBack}) : super(size: Vector2(1290, 2796),anchor: Anchor.topCenter);
+  MachineComponent({super.anchor , super.position ,required this.onStartCallBack,required this.onStopCallBack}) : super(size: Vector2(900, 1600));
   final void Function() onStartCallBack;
   final void Function(int ratio, int luckyRatio, double resultAmount) onStopCallBack;
 
   late Global _global;
   late ModeEvent _modeEvent;
 
-  late SpriteComponent _machineFrame;
+  late SpriteComponent _machineBackground;
   late MachineBannerComponent _machineBanner;
   late MachineRollerComponent _firstMachineRollerComponent;
   late MachineRollerComponent _secondMachineRollerComponent;
@@ -187,22 +187,30 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     _modeEvent = ModeEvent();
     _modeEvent.add(ModeEventType.extraBet, (arg){
       _enableExtraBetMode();
-      print('Josh ModeEvent1');
     });
-    _machineFrame = SpriteComponent(sprite: await Sprite.load('images/machine_background.png'),size: Vector2(1614,1025),position:Vector2(-162,0));
-    add(_machineFrame);
+
+    _initMachineBackground();
     _intiMachineRollerComponent();
     _initMachineBanner();
     super.onLoad();
   }
 
+  Future<void> _initMachineBackground() async {
+    double width = 1160;
+    double height = 1100;
+    double positionX = localCenter.x - width/2;
+    double positionY = 0;
+    _machineBackground = SpriteComponent(sprite: await Sprite.load('images/machine_background.png'),size: Vector2(width,height),position:Vector2(positionX,positionY));
+    add(_machineBackground);
+  }
+
 
   void _intiMachineRollerComponent(){
 
-    _firstMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position: Vector2(35,135),priority:0,onStopCallBack:(){} );
-    _secondMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position: Vector2(332,135),priority:1,onStopCallBack:(){});
-    _thirdMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position:  Vector2(635,135),priority:0,onStopCallBack:(){});
-    _ratioMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.ratio,position: Vector2(930,135),priority:1,onStopCallBack:(){
+    _firstMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position: Vector2(30,190),priority:1,onStopCallBack:(){} );
+    _secondMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position: Vector2(240,190),priority:1,onStopCallBack:(){});
+    _thirdMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.common,position:  Vector2(450,190),priority:1,onStopCallBack:(){});
+    _ratioMachineRollerComponent = MachineRollerComponent(rollerType:RollerType.ratio,position: Vector2(660,190),priority:1,onStopCallBack:(){
       _stopResult();
     });
     _rollers.addAll([

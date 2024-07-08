@@ -26,7 +26,7 @@ class MachineControllerComponent extends PositionComponent {
     required this.onTapAutoButton,
     required this.onTapSpeedButton,
     required this.onTapExtraBetSwitch,
-  }) : super(size: Vector2(1290, 2796));
+  }) : super(size: Vector2(900, 1600));
   final void Function() onTapSpinButton;
   final void Function() onTapBetButton;
   final void Function() onTapSettingButton;
@@ -36,7 +36,7 @@ class MachineControllerComponent extends PositionComponent {
 
 
 
-  final double _bottomControllerCenterY = 2796 - 250;
+  final double _bottomControllerCenterY = 1600 - 150;
   final Color _textTitleColor = const Color.fromRGBO(248, 215, 97, 1);
   final Color _textSubTitleColor = const Color.fromRGBO(255, 255, 255, 1);
 
@@ -127,7 +127,7 @@ class MachineControllerComponent extends PositionComponent {
     _modeEvent = ModeEvent();
     _currentBetGridItems = _global.betAmount.toString().getGridItems;
     _betAmount = _global.betAmount.toDouble();
-    await _initBottomBackground();
+    // await _initBottomBackground();
     _initExtraButton();
     _initSpinButton();
     _initAutoButton();
@@ -160,14 +160,14 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initExtraButton(){
-    double buttonWidth = 174;
-    double buttonHeight = 132;
+    double buttonWidth = 140;
+    double buttonHeight = 110;
     double positonX = 0;
-    double positonY = localCenter.y-buttonHeight;
+    double positonY = localCenter.y-buttonHeight*2;
     _extraButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_extra.png',
+      iconPath: 'icons/buttons/button_extra.png',
       onTap: () {
         if(_isShowExtraMenu){
           _isShowExtraMenu = false;
@@ -183,8 +183,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initSpinButton(){
-    double buttonWidth = 280;
-    double buttonHeight = 280;
+    double buttonWidth = 150;
+    double buttonHeight = 150;
     double positonX = localCenter.x-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _spinButton = IconButton(
@@ -204,8 +204,8 @@ class MachineControllerComponent extends PositionComponent {
 
   void _initAutoButton(){
 
-    double buttonWidth = 150;
-    double buttonHeight = 150;
+    double buttonWidth = 100;
+    double buttonHeight = 100;
     double positonX = localCenter.x * 1.4 - buttonWidth / 2;
     double positonY = _bottomControllerCenterY - buttonHeight / 2;
     _autoButton = IconButton(
@@ -237,8 +237,8 @@ class MachineControllerComponent extends PositionComponent {
   void _initSpeedButton(){
     String disableIconPath = 'icons/buttons/button_speed_disable.png';
     String enableIconPath = 'icons/buttons/button_speed_enable.png';
-    double buttonWidth = 150;
-    double buttonHeight = 150;
+    double buttonWidth = 100;
+    double buttonHeight = 100;
     double positonX = localCenter.x *1.65-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _speedButton = IconButton(
@@ -264,8 +264,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initBetButton(){
-    double buttonWidth = 150;
-    double buttonHeight = 150;
+    double buttonWidth = 100;
+    double buttonHeight = 100;
     double positonX = localCenter.x *0.6-buttonWidth/2;
     double positonY = _bottomControllerCenterY-buttonHeight/2;
     _betButton = IconButton(
@@ -288,10 +288,10 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initSettingButton(){
-    double buttonWidth = 150;
-    double buttonHeight = 150;
+    double buttonWidth = 100;
+    double buttonHeight = 100;
     double positonX = localCenter.x *0.2-buttonWidth/2;
-    double positonY = _bottomControllerCenterY-buttonHeight/2;
+    double positonY = _bottomControllerCenterY - buttonHeight/2;
     _settingButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
@@ -314,8 +314,8 @@ class MachineControllerComponent extends PositionComponent {
 
   void _initBalanceTitleText(){
 
-    double fontSize = 60;
-    double positonX = localCenter.x - 300;
+    double fontSize = 30;
+    double positonX = localCenter.x - 150;
     double positonY = localBottom.y - fontSize *1.4;
     _balanceTitleText = TextComponent(
       text:'Balance',
@@ -333,8 +333,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initBalanceAmountText(){
-    double fontSize = 60;
-    double positonX = localCenter.x - 50;
+    double fontSize = 30;
+    double positonX = localCenter.x - 30;
     double positonY = localBottom.y - fontSize *1.4;
     _balanceAmountText = TextComponent(
       text:_balanceAmount.toStringAsFixed(2),
@@ -354,9 +354,9 @@ class MachineControllerComponent extends PositionComponent {
 
   void _initWinTitleText(){
 
-    double fontSize = 60;
-    double positonX = localCenter.x - 300;
-    double positonY = _bottomControllerCenterY - 250 ;
+    double fontSize = 30;
+    double positonX = localCenter.x - 150;
+    double positonY = _bottomControllerCenterY - 120 ;
     _winTitleText = TextComponent(
       text:'WIN',
       textRenderer: TextPaint(
@@ -372,9 +372,9 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initWinAmountText(){
-    double fontSize = 60;
-    double positonX = localCenter.x - 50;
-    double positonY = _bottomControllerCenterY - 250 ;
+    double fontSize = 30;
+    double positonX = localCenter.x - 30;
+    double positonY = _bottomControllerCenterY - 120 ;
     _winAmountText = TextComponent(
       text:_winAmount.toStringAsFixed(2),
       textRenderer: TextPaint(
@@ -392,7 +392,7 @@ class MachineControllerComponent extends PositionComponent {
 
   void _initBetAmountTitleText(){
 
-    double fontSize = 40;
+    double fontSize = 25;
     double positonX = _betButton.position.x;
     double positonY = _betButton.position.y + _betButton.size.y ;
     _betTitleText = TextComponent(
@@ -410,8 +410,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initBetAmountText(){
-    double fontSize = 40;
-    double positonX = _betButton.position.x + 80;
+    double fontSize = 25;
+    double positonX = _betButton.position.x + 50;
     double positonY = _betButton.position.y + _betButton.size.y ;
     _betAmountText = TextComponent(
       text:_betAmount.toStringAsFixed(1),
@@ -428,10 +428,10 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initExtraMenu(){
-    double buttonWidth = 500;
-    double buttonHeight = 100;
+    double buttonWidth = 510;
+    double buttonHeight = 110;
     double positonX = _extraButton.size.x*0.7;
-    double positonY = localCenter.y-buttonHeight;
+    double positonY = _extraButton.position.y;
     _extraMenu = ExtraMenuComponent(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX,positonY),

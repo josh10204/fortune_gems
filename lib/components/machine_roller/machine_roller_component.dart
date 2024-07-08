@@ -24,7 +24,7 @@ enum RollerStatus {
   stopped,
 }
 class MachineRollerComponent extends PositionComponent {
-  MachineRollerComponent({super.position,super.priority,required this.rollerType,required this.onStopCallBack}) : super(size: Vector2(332.8,681.6));
+  MachineRollerComponent({super.position,super.priority,required this.rollerType,required this.onStopCallBack}) : super(size: Vector2(210,480));
 
   final void Function() onStopCallBack;
 
@@ -32,8 +32,8 @@ class MachineRollerComponent extends PositionComponent {
   late Global _global;
 
   List<MachineRollerSymbol> _slotMachineRollerSymbolList = [];
-  static const double _rollerHeight = 681.6;
-  static const double _symbolHeight = 227.2;
+  static const double _rollerHeight = 480;
+  static const double _symbolHeight = 160;
   static const double _rollingSpeed= 5000;
   double _currentRollingSpeed = _rollingSpeed;
 
@@ -90,11 +90,11 @@ class MachineRollerComponent extends PositionComponent {
   Future<void> updateExtraIcon({required isShow}) async {
     if(isShow){
       _extraIconSpriteComponent = SpriteComponent(
-          sprite: await Sprite.load('icons/button_extra.png'),
+          sprite: await Sprite.load('icons/buttons/button_extra.png'),
           anchor: Anchor.center,
-          size: Vector2(87, 66),
+          size: Vector2(70, 55),
 
-        position: Vector2(40, _symbolHeight * 1.5),
+        position: Vector2(10, _symbolHeight * 1.5),
       );
       add(_extraIconSpriteComponent);
     }else{
@@ -137,7 +137,7 @@ class MachineRollerComponent extends PositionComponent {
 
   Future<void> _initSelectFrame() async {
 
-    add(SpriteComponent(sprite: await Sprite.load('images/machine_select_frame.png'),size: Vector2(324.8,268.8),position: Vector2(-1,_symbolHeight-10)));
+    add(SpriteComponent(sprite: await Sprite.load('images/machine_select_frame.png'),size: Vector2(220,180),position: Vector2(0,_symbolHeight-10)));
   }
 
   void _initRollerSymbolList(){

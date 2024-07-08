@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
 
 class HeaderComponent extends SpriteComponent {
-  HeaderComponent() : super(size: Vector2(1290, 2796),anchor: Anchor.bottomCenter);
+  HeaderComponent() : super(size: Vector2(900, 1600),anchor: Anchor.bottomCenter);
 
 
   @override

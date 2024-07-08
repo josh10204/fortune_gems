@@ -14,22 +14,16 @@ class MachineBannerComponent extends PositionComponent{
 
   @override
   void onLoad() async {
-    _initBannerFrame();
     _initMarquee();
     super.onLoad();
   }
 
-  Future<void> _initBannerFrame() async {
-    _bannerFrame  = SpriteComponent(sprite: await Sprite.load('images/machine_banner_background.png'),size: Vector2(1290,164));
-    add(_bannerFrame);
-
-  }
 
   Future<void> _initMarquee() async {
-    double width = 900;
-    double height = 70;
-    double positonX = 50;
-    double positonY = localCenter.y-height/2;
+    double width = 630;
+    double height = 50;
+    double positonX = 30;
+    double positonY = localCenter.y + height*0.6;
     List<ImageMarqueeModel> modelList = [];
     ImageMarqueeModel model01= ImageMarqueeModel(imageFilePath: 'images/marquee_image01.png',imageWidth: 1211,imageHeight: 50);
     ImageMarqueeModel model02= ImageMarqueeModel(imageFilePath: 'images/marquee_image02.png',imageWidth: 765,imageHeight: 50);

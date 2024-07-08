@@ -28,10 +28,11 @@ class MachineRollerSymbol extends SpriteComponent {
 
 
   // late ScaleEffect _scaleEffect  ;
-  final Vector2 generalSymbolSize = Vector2(278.4,227.2);
-  final Vector2 specialSymbolSize = Vector2(332.8,316.8);
+  final Vector2 generalSymbolSize = Vector2(200,160);
+  final Vector2 specialSymbolSize = Vector2(210,200);
+
   //特殊方塊的中心位置Y軸
-  final double specialSymbolCenterY = 316.8/2 - 227.2/2;
+  final double specialSymbolCenterY = 200/2 - 160/2;
 
   bool _isAnimation = false;
 
@@ -90,12 +91,12 @@ class MachineRollerSymbol extends SpriteComponent {
 
         break;
       case MachineRollerSymbolStatus.mask:
-        sprite = await Sprite.load(rollerSymbolModel.type.unselectImagePath);
+        // sprite = await Sprite.load(rollerSymbolModel.type.unselectImagePath);
         // _scaleEffect.pause();
         break;
       case MachineRollerSymbolStatus.animation:
         sprite = await Sprite.load(rollerSymbolModel.type.imagePath);
-        priority = 2;
+        // priority = 2;
         // _isAnimation = true;
         // _scaleEffect.reset();
         break;
@@ -120,7 +121,6 @@ class MachineRollerSymbol extends SpriteComponent {
       position = Vector2(position.x, generalSymbolSize.y*index);
 
     }
-
 
     // _initScaleEffect();
     super.onLoad();

@@ -43,7 +43,7 @@ class WheelItem extends PositionComponent {
 
   void updateBetNumber(double number){
     remove( _numberSpriteComponent);
-    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),size: Vector2(width,height),number:number*type.ratio,fontScale: 0.75);
+    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),size: Vector2(width,height),number:number*type.ratio,fontScale: 0.5);
     add(_numberSpriteComponent);
   }
   @override
@@ -58,15 +58,15 @@ class WheelItem extends PositionComponent {
   void _initNumberSpriteComponent(){
     double number = betAmount.toDouble() * type.ratio;
 
-    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),number:number,size: Vector2(width,height),fontScale: 0.75);
+    _numberSpriteComponent = NumberSpriteComponent(position: Vector2.zero(),number:number,size: Vector2(width,height),fontScale: 0.5);
     add(_numberSpriteComponent);
   }
 
   Vector2 _getOpenPosition(){
     double theta = type.numberPositionAngle; // 將角度轉為弧度
     double radius = min(basicCenter.x, basicCenter.y);
-    double positionX = basicCenter.x + radius * 0.65 * cos(theta); // 調整0.7以確保數字在扇區內
-    double positionY = basicCenter.y + radius * 0.65 * sin(theta);
+    double positionX = basicCenter.x + radius * 0.6 * cos(theta); // 調整0.7以確保數字在扇區內
+    double positionY = basicCenter.y + radius * 0.6 * sin(theta);
     return Vector2(positionX,positionY);
   }
 

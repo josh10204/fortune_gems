@@ -33,7 +33,7 @@ class GameMain extends FlameGame{
   double _scoreAmount = 0;
   WinningType _winningType = WinningType.none;
 
-  GameMain() : super(camera: CameraComponent.withFixedResolution(width: 1290, height:2796)) {
+  GameMain() : super(camera: CameraComponent.withFixedResolution(width: 900, height:1600)) {
     // pauseWhenBackgrounded = false;
     // debugMode = true;
 
@@ -173,13 +173,15 @@ class GameMain extends FlameGame{
   void _initWheelComponent(){
     _wheelComponent = WheelComponent(
         anchor: Anchor.center,
-        position: Vector2.zero(),);
+        position:  Vector2.zero());
     _wheelComponent.priority = 2;
     world.add(_wheelComponent);
   }
 
   void _initMachineComponent()  {
     _machineComponent = MachineComponent(
+        anchor: Anchor.center,
+        position: Vector2(0,size.y*0.38),
         onStartCallBack: () {
           _gameStatusProcess();
         },

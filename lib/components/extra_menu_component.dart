@@ -23,10 +23,10 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   late IconButton _aboutButton;
 
   final MoveToEffect _showExtraMenuEffect = MoveToEffect(Vector2(0,0), EffectController(duration: 0.2),);
-  final MoveToEffect _closeExtraMenuEffect = MoveToEffect(Vector2(-350,0), EffectController(duration: 0.2),);
+  final MoveToEffect _closeExtraMenuEffect = MoveToEffect(Vector2(-400,0), EffectController(duration: 0.2),);
   bool _isOnExtra = false;
-  final String _offIconPath  = 'icons/button_extra_off.png';
-  final String _onIconPath  = 'icons/button_extra_on.png';
+  final String _offIconPath  = 'icons/buttons/button_extra_off.png';
+  final String _onIconPath  = 'icons/buttons/button_extra_on.png';
 
 
   void showExtraMenu(){
@@ -54,7 +54,7 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
     _initAboutButton();
   }
   Future<void> _initBasic() async {
-    _basicView = PositionComponent(size: size,position: Vector2(-350,0));
+    _basicView = PositionComponent(size: size,position: Vector2(-400,0));
     add(_basicView);
     add(ClipComponent.rectangle(size: size, children: [_basicView],));
   }
@@ -63,14 +63,14 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   Future<void> _initMenuBar() async {
     _menuBar = SpriteComponent(
       sprite: await Sprite.load('images/extra_menu_background.png'),
-      size: Vector2(390, 100),
+      size: Vector2(440, 110),
       position: Vector2.zero(),
     );
     _basicView.add(_menuBar);
   }
   void _initTitleText(){
-    double fontSize = 32.0;
-    double positonX = 60;
+    double fontSize = 40;
+    double positonX = 40;
     double positonY = localCenter.y - fontSize*0.7;
     final regular = TextPaint(
       style: TextStyle(
@@ -90,9 +90,9 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   }
 
   Future<void> _initSwitchButton() async {
-    double buttonWidth = 184;
-    double buttonHeight = 78.4;
-    double positonX = 190;
+    double buttonWidth = 170;
+    double buttonHeight = 110;
+    double positonX = 220;
     double positonY = localCenter.y-buttonHeight/2;
     _switchButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
@@ -118,14 +118,14 @@ class ExtraMenuComponent extends PositionComponent  with HasVisibility{
   }
 
   Future<void> _initAboutButton() async {
-    double buttonWidth = 100;
+    double buttonWidth = 70;
     double buttonHeight = 100;
-    double positonX = 390;
+    double positonX = 440;
     double positonY = localCenter.y-buttonHeight/2;
     _aboutButton = IconButton(
       size: Vector2(buttonWidth, buttonHeight),
       position: Vector2(positonX, positonY),
-      iconPath: 'icons/button_extra_about.png',
+      iconPath: 'icons/buttons/button_extra_about.png',
       onTap: (){}
     );
     _basicView.add(_aboutButton);

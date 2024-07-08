@@ -20,7 +20,7 @@ enum WheelRotateStatus {
   still,
 }
 class WheelComponent extends PositionComponent {
-  WheelComponent({super.position,super.anchor }) : super(size: Vector2(1290, 2796));
+  WheelComponent({super.position,super.anchor }) : super(size: Vector2(900, 1600));
 
 
   late Global _global;
@@ -97,27 +97,27 @@ class WheelComponent extends PositionComponent {
   }
 
   void _initBasicWheel(){
-    _basicWheel = PositionComponent(size:Vector2(1142,1142),anchor: Anchor.center,position: localCenter,priority: 1);
+    _basicWheel = PositionComponent(size:Vector2(900,900),anchor: Anchor.center,position: Vector2(localCenter.x,localCenter.y- 180),priority: 1);
     add(_basicWheel);
   }
 
   Future<void> _initWheel() async {
-    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(1142,1142),priority: 1);
+    _wheel  = SpriteComponent(sprite: await Sprite.load('images/wheel.png'),size: Vector2(900,900),priority: 1);
     _basicWheel.add(_wheel);
   }
 
   Future<void> _initWheelFrame() async {
-    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(1142,1142),priority: 1);
+    _wheelFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_frame.png'),size: Vector2(900,900),priority: 1);
     _basicWheel.add(_wheelFrame);
   }
 
   Future<void> _initWheelSelectFrame() async {
-    _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(397.8,712.4),position: Vector2(localCenter.x,localCenter.y-290),anchor: Anchor.center,priority: 3);
+    _wheelSelectFrame  = SpriteComponent(sprite: await Sprite.load('images/wheel_select_frame.png'),size: Vector2(240,420),position: Vector2(localCenter.x,localCenter.y-400),anchor: Anchor.center,priority: 3);
     add(_wheelSelectFrame);
   }
 
   Future<void> _initWheelCenterLogo() async {
-    _wheelCenterLogo  = SpriteComponent(sprite: await Sprite.load('images/wheel_center_logo.png'),size: Vector2(248,248),position: localCenter,anchor: Anchor.center,priority: 4);
+    _wheelCenterLogo  = SpriteComponent(sprite: await Sprite.load('images/wheel_center_logo.png'),size: Vector2(150,150),position: Vector2(localCenter.x,localCenter.y- 180),anchor: Anchor.center,priority: 4);
     add(_wheelCenterLogo);
   }
 

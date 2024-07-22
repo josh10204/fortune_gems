@@ -11,8 +11,8 @@ import 'package:fortune_gems/system/global.dart';
 
 
 enum ScoreBoardType{
-  common(imagePath:'images/score_board_background.png',width:546,height:166),
-  wheel(imagePath:'images/score_board_wheel_background.png',width:1018,height:172);
+  common(imagePath:'images/score_board_background.png',width:304,height:119),
+  wheel(imagePath:'images/score_board_wheel_background.png',width:550,height:100);
   final String imagePath;
   final double width;
   final double height;
@@ -21,7 +21,7 @@ enum ScoreBoardType{
 }
 
 class ScoreBoardComponent extends PositionComponent {
-  ScoreBoardComponent({super.position,super.anchor,required this.type,required this.ratio,required this.luckyRatio, required this.scoreAmount,required this.onCallBack}) : super(size: Vector2(1290, 227.2));
+  ScoreBoardComponent({super.position,super.anchor,required this.type,required this.ratio,required this.luckyRatio, required this.scoreAmount,required this.onCallBack}) : super(size: Vector2(900, 227.2));
   final void Function(double totalScoreAmount,WinningType winningType) onCallBack;
   ScoreBoardType type;
   double scoreAmount;
@@ -58,7 +58,7 @@ class ScoreBoardComponent extends PositionComponent {
     await _initFrameSpriteComponent();
     await _initTitleSpriteComponent();
     await _initPlusNumberSpriteComponent();
-    _initNumberSpriteComponent();
+    await _initNumberSpriteComponent();
   }
 
   void _loadData(){
@@ -88,10 +88,10 @@ class ScoreBoardComponent extends PositionComponent {
 
   Future<void> _initTitleSpriteComponent() async {
     if(type == ScoreBoardType.common) return;
-    double width = 174;
-    double height = 52;
-    double positionX = _contentSize.x *0.75 + _wheelContentPending.x - width/2;
-    double positionY = localTop.y - height/2;
+    double width = 120;
+    double height = 120;
+    double positionX = _contentSize.x *0.8 + _wheelContentPending.x - width/2;
+    double positionY = localTop.y - height/1.5;
     _titleSpriteComponent = SpriteComponent();
     _titleSpriteComponent.size =  Vector2(width,height);
     _titleSpriteComponent.position =  Vector2(positionX, positionY);
@@ -102,8 +102,8 @@ class ScoreBoardComponent extends PositionComponent {
 
   Future<void> _initPlusNumberSpriteComponent() async {
     if(type == ScoreBoardType.common) return;
-    double width = 56;
-    double height = 58;
+    double width = 44;
+    double height = 44;
     double positionX = _contentSize.x/2 + _wheelContentPending.x - width/2;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
     _plusSpriteComponent = SpriteComponent();
@@ -129,18 +129,18 @@ class ScoreBoardComponent extends PositionComponent {
 
   void _initCommonNumberSpriteComponent(){
     double positionX = _commonContentPending.x;
-    double positionY = _frameSpriteComponent.localCenter.y - _contentSize.y/2;
+    double positionY = _frameSpriteComponent.localCenter.y - _contentSize.y/1.8;
     _totalScoreAmount = scoreAmount * ratio;
-    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size:_contentSize,number:scoreAmount,fontScale: 1);
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size:_contentSize,number:scoreAmount,fontScale: 0.5);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
 
   Future<void> _initRatioRollerSymbol() async {
     RollerSymbolType type = ratio.toString().getRollerSymbolType;
-    double width = 278.4;
-    double height = 227.2;
-    double positionX = size.x - width*0.7;
-    double positionY = height/2;
+    double width = 200;
+    double height = 160;
+    double positionX = size.x - width*0.67;
+    double positionY = height*0.7;
     _rollerSymbol = SpriteComponent(
         sprite: await Sprite.load(type.imagePath),
         size: Vector2(width, height),
@@ -154,23 +154,23 @@ class ScoreBoardComponent extends PositionComponent {
     double height = _contentSize.y;
     double positionX = _wheelContentPending.x;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:scoreAmount,fontScale: 1);
+    _numberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:scoreAmount,fontScale: 0.5);
     _frameSpriteComponent.add(_numberSpriteComponent);
   }
 
   void _initAdditionNumberSpriteComponent(){
     double width = _contentSize.x/2;
     double height = _contentSize.y;
-    double positionX = width + _wheelContentPending.x;
+    double positionX = _contentSize.x *0.8 + _wheelContentPending.x - width/2;
     double positionY = _frameSpriteComponent.localCenter.y - height/2;
-    _additionNumberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:0,fontScale: 1);
+    _additionNumberSpriteComponent = NumberSpriteComponent(position:Vector2(positionX,positionY),size: Vector2(width,height),number:0,fontScale: 0.5);
     _frameSpriteComponent.add(_additionNumberSpriteComponent);
   }
 
 
   Future<void> _showCommonScoreBoardEffect() async {
     _numberSpriteComponent.resetNumber(_totalScoreAmount);
-    ScaleEffect scaleEffect = ScaleEffect.to(Vector2(1.2,1.2), EffectController(duration: 1,curve: Curves.elasticOut),);
+    ScaleEffect scaleEffect = ScaleEffect.to(Vector2(1.1,1.1), EffectController(duration: 1,curve: Curves.elasticOut),);
     MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, size.y/2), EffectController(duration: 0.3),);
     OpacityEffect opacityEffect = OpacityEffect.fadeOut(EffectController(duration: 1),);
     _rollerSymbol.add(scaleEffect);

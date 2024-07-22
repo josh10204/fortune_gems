@@ -10,13 +10,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fortune_gems/components/machine_banner_component.dart';
 import 'package:fortune_gems/components/machine_roller/machine_roller_component.dart';
-import 'package:fortune_gems/components/score_board_component.dart';
-import 'package:fortune_gems/demo_data.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/extension/string_extension.dart';
+import 'package:fortune_gems/model/res/slot_game_res.dart';
 import 'package:fortune_gems/model/rolller_symbol_model.dart';
-import 'package:fortune_gems/model/slot_game_model.dart';
 import 'package:fortune_gems/system/global.dart';
+import 'package:fortune_gems/system/http/http_manager.dart';
 import 'package:fortune_gems/system/mode_event.dart';
 
 
@@ -24,7 +23,7 @@ import 'package:fortune_gems/system/mode_event.dart';
 class MachineComponent extends PositionComponent with TapCallbacks{
   MachineComponent({super.anchor , super.position ,required this.onStartCallBack,required this.onStopCallBack}) : super(size: Vector2(900, 1600));
   final void Function() onStartCallBack;
-  final void Function(int ratio, int luckyRatio, double resultAmount) onStopCallBack;
+  final void Function(int ratio, int luckyRatio, int exLuckyRatio,double resultAmount) onStopCallBack;
 
   late Global _global;
   late ModeEvent _modeEvent;
@@ -35,7 +34,6 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   late MachineRollerComponent _secondMachineRollerComponent;
   late MachineRollerComponent _thirdMachineRollerComponent;
   late MachineRollerComponent _ratioMachineRollerComponent;
-  late ScoreBoardComponent _scoreBoardComponent;
 
   final List<MachineRollerComponent> _rollers = [];
   // bool _isStartRolling = false;
@@ -49,12 +47,14 @@ class MachineComponent extends PositionComponent with TapCallbacks{
   int _ratio = 0;
   /// 幸運輪盤中獎倍率
   int _luckyRatio = 1;
+  /// 幸運輪盤EX中獎倍率
+  int _exLuckyRatio = 0;
   /// 單局全部中獎分數（不含中獎倍率，除非幸運輪盤）
   double _playResultAmount = 0;
 
 
   /// demo資料順序
-  int _currentDemoIndex = 1;
+  // int _currentDemoIndex = 1;
   void startRollingMachine(){
     if(_global.gameStatus == GameStatus.idle){
       _global.gameStatus = GameStatus.startSpin;
@@ -67,71 +67,83 @@ class MachineComponent extends PositionComponent with TapCallbacks{
     for(MachineRollerComponent machineRollerComponent in _rollers){
       machineRollerComponent.startRolling();
     }
-    _updateRollerSymbol();
+    _reloadRollerSymbol();
   }
-  Future<void> _updateRollerSymbol() async {
-    /// 模擬資料
-    SlotGameModel gameModel = SlotGameModel.fromJson(DemoData().resultMap);
 
-    /// 顯示盤面處理
-    List<Detail> detailList = gameModel.detail??[];
-    Detail detail = detailList[_currentDemoIndex];
-    _ratio = detail.ratio ?? 0;
-    _luckyRatio = detail.luckyRatio ?? 1;
-    String ratio = _ratio.toString();
-    List<String> panelList =detail.panel??[];
-    List<String> firstList = [];
-    List<String> secondList = [];
-    List<String> thirdList = [];
-    List<String> ratioList = [ratio];
-    // 分別取出第 0、3、6 跟 1、4、7 以及 2、5、8
-    for (int i = 0; i < panelList.length; i++) {
-      if (i % 3 == 0) {
-        firstList.add(panelList[i]);
-      } else if (i % 3 == 1) {
-        secondList.add(panelList[i]);
-      } else if (i % 3 == 2) {
-        thirdList.add(panelList[i]);
+  Future<void> _reloadRollerSymbol() async {
+    HttpManager().reloadSlotGameDemoData(
+      onConnectSuccess: (code, slotGameResultMap) async {
+        _updateRollerSymbol(slotGameResultMap);
+      },
+      onConnectFail: (msg) {
+        print(msg);
+
+      },
+    );
+
+  }
+
+  Future<void> _updateRollerSymbol(SlotGameRes slotGameResultMap) async {
+      /// 顯示盤面處理
+      List<SlotGameDetail> detailList = slotGameResultMap.detail??[];
+      SlotGameDetail detail = detailList[0];
+      _ratio = detail.ratio ?? 0;
+      _luckyRatio = detail.luckyRatio ?? 1;
+      _exLuckyRatio = detail.exLuckyRatio ?? 0;
+      String ratio = _ratio.toString();
+      List<String> panelList =detail.panel??[];
+      List<String> firstList = [];
+      List<String> secondList = [];
+      List<String> thirdList = [];
+      List<String> ratioList = [ratio];
+      // 分別取出第 0、3、6 跟 1、4、7 以及 2、5、8
+      for (int i = 0; i < panelList.length; i++) {
+        if (i % 3 == 0) {
+          firstList.add(panelList[i]);
+        } else if (i % 3 == 1) {
+          secondList.add(panelList[i]);
+        } else if (i % 3 == 2) {
+          thirdList.add(panelList[i]);
+        }
       }
-    }
 
-    /// 中獎結果處理
-    List<Result> resultList =detail.result??[];
-    // 是否有中獎
-    _isHasWinning = resultList.isNotEmpty;
-    // 全部中獎線
-    _allPayLineTypeList = [];
-    _playResultAmount = 0;
-    for (Result result in resultList) {
-      _allPayLineTypeList.add(result.line.toString().getRollerPayLineType);
-      _playResultAmount += result.playResult ??0;
-    }
-    if(_ratio !=0 ){
-      _playResultAmount = _playResultAmount/_ratio;
-    }
+      /// 中獎結果處理
+      List<SlotGameResult> resultList =detail.result??[];
+      // 是否有中獎
+      _isHasWinning = resultList.isNotEmpty;
+      // 全部中獎線
+      _allPayLineTypeList = [];
+      _playResultAmount = 0;
+      for (SlotGameResult result in resultList) {
+        _allPayLineTypeList.add(result.line.toString().getRollerPayLineType);
+        _playResultAmount += result.playResult ??0;
+      }
+      if(_ratio !=0 ){
+        _playResultAmount = _playResultAmount/_ratio;
+      }
 
-    /// 資料轉換成RollerSymbolModel
-    List<RollerSymbolModel> firstModelList = _getRollerSymbolModelList(symbolList: firstList,allResultList:resultList);
-    List<RollerSymbolModel> secondModelList = _getRollerSymbolModelList(symbolList: secondList,allResultList:resultList);
-    List<RollerSymbolModel> thirdModelList = _getRollerSymbolModelList(symbolList: thirdList,allResultList:resultList);
-    List<RollerSymbolModel> ratioModelList = _getRollerSymbolModelList(symbolList: ratioList,allResultList:[]);
+      /// 資料轉換成RollerSymbolModel
+      List<RollerSymbolModel> firstModelList = _getRollerSymbolModelList(symbolList: firstList,allResultList:resultList);
+      List<RollerSymbolModel> secondModelList = _getRollerSymbolModelList(symbolList: secondList,allResultList:resultList);
+      List<RollerSymbolModel> thirdModelList = _getRollerSymbolModelList(symbolList: thirdList,allResultList:resultList);
+      List<RollerSymbolModel> ratioModelList = _getRollerSymbolModelList(symbolList: ratioList,allResultList:[]);
 
 
-    /// 更新資料
-    _firstMachineRollerComponent.updateRollerSymbolList(modelList:firstModelList);
-    _secondMachineRollerComponent.updateRollerSymbolList(modelList:secondModelList);
-    _thirdMachineRollerComponent.updateRollerSymbolList(modelList:thirdModelList);
-    _ratioMachineRollerComponent.updateRollerSymbolList(modelList: ratioModelList);
+      /// 更新資料
+      _firstMachineRollerComponent.updateRollerSymbolList(modelList:firstModelList);
+      _secondMachineRollerComponent.updateRollerSymbolList(modelList:secondModelList);
+      _thirdMachineRollerComponent.updateRollerSymbolList(modelList:thirdModelList);
+      _ratioMachineRollerComponent.updateRollerSymbolList(modelList: ratioModelList);
 
-    ///Demo 順序往下，超過後重複
-    _currentDemoIndex +=1;
-    _currentDemoIndex  =  _currentDemoIndex >= detailList.length ? 0 : _currentDemoIndex;
-    /// 模擬跟後端取得完資料停止 delay 時間
-    await Future.delayed(const Duration(milliseconds: 500));
-    _stopRolling();
+      ///Demo 順序往下，超過後重複
+      // _currentDemoIndex +=1;
+      // _currentDemoIndex  =  _currentDemoIndex >= detailList.length ? 0 : _currentDemoIndex;
+      /// 模擬跟後端取得完資料停止 delay 時間
+      // await Future.delayed(const Duration(milliseconds: 500));
+      _stopRolling();
   }
 
-  List<RollerSymbolModel> _getRollerSymbolModelList({required List<String> symbolList,required List<Result> allResultList}){
+  List<RollerSymbolModel> _getRollerSymbolModelList({required List<String> symbolList,required List<SlotGameResult> allResultList}){
 
     List<RollerSymbolModel> modelList = [];
     for(String symbol in symbolList){
@@ -159,11 +171,11 @@ class MachineComponent extends PositionComponent with TapCallbacks{
       _showRollerWinningSymbolAnimation();
       ///TODO:未來要在此加上動效，這邊先用delay方式代表動效部分
       await Future.delayed(const Duration(milliseconds: 1000));
-      onStopCallBack(_ratio, _luckyRatio,_playResultAmount);
+      onStopCallBack(_ratio, _luckyRatio,_exLuckyRatio,_playResultAmount);
     }else{
       await Future.delayed(const Duration(milliseconds: 500));
       _global.gameStatus = GameStatus.stopSpin;
-      onStopCallBack(0, 0,0);
+      onStopCallBack(0, 0,0,0);
     }
   }
 

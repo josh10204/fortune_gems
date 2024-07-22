@@ -20,7 +20,7 @@ enum WinningType{
 }
 
 class WinningComponent extends PositionComponent {
-  WinningComponent({super.position,super.anchor,required this.winningType,required this.scoreAmount, required this.onCallBack}) : super(size: Vector2(1290, 2796));
+  WinningComponent({super.position,super.anchor,required this.winningType,required this.scoreAmount, required this.onCallBack}) : super(size: Vector2(900, 1600));
 
   WinningType winningType;
   double scoreAmount;
@@ -106,8 +106,8 @@ class WinningComponent extends PositionComponent {
 
   Future<void> _initTitleSpriteComponent() async {
 
-    double width = 564*1.5;
-    double height = 175*1.5;
+    double width = 564;
+    double height = 175;
     double positionX = localCenter.x ;
     double positionY = localCenter.y - height*1.2;
 
@@ -121,8 +121,8 @@ class WinningComponent extends PositionComponent {
   }
 
   Future<void> _initSubtitleSpriteComponent() async {
-    double width = 606*0.8;
-    double height = 273*0.8;
+    double width = 606*0.5;
+    double height = 273*0.5;
     double positionX = localCenter.x ;
     double positionY = localCenter.y -  height/2;
     _subtitleSpriteComponent = SpriteComponent(
@@ -135,9 +135,9 @@ class WinningComponent extends PositionComponent {
   }
 
   Future<void> _initLeftBirdSpriteComponent() async {
-    double width = 231*1.5;
-    double height = 208*1.5;
-    double positionX = localCenter.x - width*1.3;
+    double width = 231;
+    double height = 208;
+    double positionX = localCenter.x - width*1.4;
     double positionY = localCenter.y - height/2;
     _leftBirdSpriteComponent = SpriteComponent(
         sprite: await Sprite.load('images/win_bird_left.png'),
@@ -149,9 +149,9 @@ class WinningComponent extends PositionComponent {
   }
 
   Future<void> _initRightBirdSpriteComponent() async {
-    double width = 231*1.5;
-    double height = 208*1.5;
-    double positionX = localCenter.x + width*1.3;
+    double width = 231;
+    double height = 208;
+    double positionX = localCenter.x + width*1.4;
     double positionY = localCenter.y - height/2;
     _rightBirdSpriteComponent = SpriteComponent(
         sprite: await Sprite.load('images/win_bird_right.png'),
@@ -163,8 +163,8 @@ class WinningComponent extends PositionComponent {
   }
 
   void _initAmountBasicComponent(){
-    double width = 1200;
-    double height = 150;
+    double width = 900;
+    double height = 100;
     double positionX = localCenter.x - width/2;
     double positionY = localCenter.y;
     final gradientPaint = Paint()

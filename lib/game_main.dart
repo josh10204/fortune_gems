@@ -29,6 +29,7 @@ class GameMain extends FlameGame{
 
   int _ratio = 0;
   int _wheelRatio = 0;
+  int _wheelExRatio = 0;
   double _wheelRatioAmount = 0;
   double _scoreAmount = 0;
   WinningType _winningType = WinningType.none;
@@ -45,12 +46,14 @@ class GameMain extends FlameGame{
         _machineControllerComponent.updateWinAmount(0.00);
         _machineControllerComponent.hideBetMenu();
         _machineControllerComponent.hideSettingMenu();
+        _machineControllerComponent.hideExtraMenu();
+        _wheelComponent.closeExtraEffect();
         break;
       case GameStatus.openScoreBoard:
         _showScoreBoardComponent(ratio: _ratio,luckyRatio: _wheelRatio,resultAmount: _scoreAmount);
         break;
       case GameStatus.openWheel:
-        _showWheelComponent(luckyRatio: _wheelRatio);
+        _showWheelComponent(luckyRatio: _wheelRatio,exLuckyRatio: _wheelExRatio);
         break;
       case GameStatus.stopWheel:
         _scoreBoardComponent.updateAdditionAmount(_wheelRatioAmount);
@@ -86,6 +89,7 @@ class GameMain extends FlameGame{
   void _resetRoundRatio(){
     _ratio = 0;
     _wheelRatio = 0;
+    _wheelExRatio = 0;
     _wheelRatioAmount = 0;
     _scoreAmount = 0;
     _winningType = WinningType.none;
@@ -105,9 +109,9 @@ class GameMain extends FlameGame{
   void _showScoreBoardComponent({required int ratio, required int luckyRatio, required double resultAmount})  {
     ScoreBoardType type = ratio == 0 ?ScoreBoardType.wheel:ScoreBoardType.common;
     double positionX = 0;
-    double positionY = size.y * 0.13;
+    double positionY = size.y * 0.15;
     _scoreBoardComponent = ScoreBoardComponent(
-        anchor: Anchor.topCenter,
+        anchor: Anchor.center,
         position: Vector2(positionX,positionY),
         type: type,
         ratio: ratio,
@@ -122,8 +126,8 @@ class GameMain extends FlameGame{
     world.add(_scoreBoardComponent);
   }
 
-  void _showWheelComponent({required int luckyRatio}){
-    _wheelComponent.startLottery(stopRatio: luckyRatio, onCallBack: (ratioAmount){
+  void _showWheelComponent({required int luckyRatio,required int exLuckyRatio}){
+    _wheelComponent.startLottery(stopRatio: luckyRatio,stopExLuckyRatio: exLuckyRatio, onCallBack: (ratioAmount){
       _wheelRatioAmount = ratioAmount;
       _gameStatusProcess();
     });
@@ -160,14 +164,13 @@ class GameMain extends FlameGame{
     _initWheelComponent();
     _initMachineComponent();
     _intiMachineControllerComponent();
+
   }
 
   void _initHeaderComponents(){
-
     _headerComponent = HeaderComponent();
     _headerComponent.priority = 1;
     world.add(_headerComponent);
-
   }
 
   void _initWheelComponent(){
@@ -185,9 +188,10 @@ class GameMain extends FlameGame{
         onStartCallBack: () {
           _gameStatusProcess();
         },
-        onStopCallBack: (ratio, luckyRatio, resultAmount) {
+        onStopCallBack: (ratio, luckyRatio, exLuckyRatio,resultAmount) {
           _ratio = ratio;
           _wheelRatio = luckyRatio;
+          _wheelExRatio = exLuckyRatio;
           _scoreAmount = resultAmount;
           _gameStatusProcess();
         });
@@ -211,6 +215,8 @@ class GameMain extends FlameGame{
       onTapExtraBetSwitch:(isEnable){
         if(isEnable){
           _showExtraBetEnableEffectComponent();
+        }else{
+          _wheelComponent.closeExtraEffect();
         }
         _wheelComponent.updateBetNumber();
 

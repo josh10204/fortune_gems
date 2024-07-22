@@ -13,7 +13,6 @@ class ModeEvent {
 
   factory ModeEvent()=> _singleton;
 
-  //保存事件订阅者队列，key:事件名(id)，value: 对应事件的订阅者队列
   final _emap = <ModeEventType, List<EventCallback>?>{};
 
   void add(ModeEventType evenType, EventCallback f) {

@@ -11,7 +11,7 @@ import 'package:fortune_gems/model/rolller_symbol_model.dart';
 import 'package:fortune_gems/model/wheel_item_model.dart';
 
 class ExtraBetEnableEffectComponent extends PositionComponent{
-  ExtraBetEnableEffectComponent({super.anchor,required this.onFinishCallBack}) : super(size: Vector2(1290, 2796));
+  ExtraBetEnableEffectComponent({super.anchor,required this.onFinishCallBack}) : super(size: Vector2(900, 1600));
 
   final void Function() onFinishCallBack;
 
@@ -21,19 +21,19 @@ class ExtraBetEnableEffectComponent extends PositionComponent{
 
   OpacityEffect fadeInEffect = OpacityEffect.fadeIn(EffectController(duration: 1),);
 
-  final double _sizeScale = 5;
+  final double _sizeScale = 2.5;
 
   Future<void> _enableEffectAnimation() async {
     _enableEffectAdditionAnimation();
     _enableEffectSymbolAnimation();
     await Future.delayed(const Duration(milliseconds: 2000));
-    onFinishCallBack.call();
+    // onFinishCallBack.call();
   }
 
   Future<void> _enableEffectAdditionAnimation() async {
     for (SpriteComponent spriteComponent in _additionList) {
       OpacityEffect fadeInEffect = OpacityEffect.fadeIn(EffectController(duration: 0.4), onComplete: () {
-        MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, localCenter.y), EffectController(duration: 0.5),);
+        MoveToEffect moveEffect = MoveToEffect(Vector2(localCenter.x, size.y*0.4), EffectController(duration: 0.5),);
         OpacityEffect fadeOutEffect = OpacityEffect.fadeOut(EffectController(duration: 0.5),);
         ScaleEffect scaleEffect = ScaleEffect.to(Vector2(0.2, 0.2), EffectController(duration: 0.5),);
         spriteComponent.add(moveEffect);
@@ -105,16 +105,16 @@ class ExtraBetEnableEffectComponent extends PositionComponent{
 
 enum EnableEffectAdditionType{
 
-  addition1(type:WheelAdditionType.addition2x,positionScaleX: 0.7,positionScaleY: 0.38),
-  addition2(type:WheelAdditionType.addition2x,positionScaleX: 0.05,positionScaleY: 0.25),
-  addition3(type:WheelAdditionType.addition15x,positionScaleX: 0,positionScaleY: 0.315),
-  addition4(type:WheelAdditionType.addition15x,positionScaleX: 0.75,positionScaleY: 0.2),
-  addition5(type:WheelAdditionType.addition5x,positionScaleX: 0.45,positionScaleY: 0.15),
-  addition6(type:WheelAdditionType.addition10x,positionScaleX: 0.2,positionScaleY: 0.2),
-  addition7(type:WheelAdditionType.addition10x,positionScaleX: 0.6,positionScaleY: 0.3),
-  addition8(type:WheelAdditionType.addition1x,positionScaleX: 1,positionScaleY: 0.31),
-  addition9(type:WheelAdditionType.addition5x,positionScaleX: 1.2,positionScaleY: 0.5),
-  addition10(type:WheelAdditionType.addition3x,positionScaleX: -0.5,positionScaleY: 0.45);
+  addition1(type:WheelAdditionType.addition2x,positionScaleX: 0.7,positionScaleY: 0.3),
+  addition2(type:WheelAdditionType.addition2x,positionScaleX: 0.1,positionScaleY: 0.15),
+  addition3(type:WheelAdditionType.addition15x,positionScaleX: 0.05,positionScaleY: 0.23),
+  addition4(type:WheelAdditionType.addition15x,positionScaleX: 0.75,positionScaleY: 0.12),
+  addition5(type:WheelAdditionType.addition5x,positionScaleX: 0.45,positionScaleY: 0.06),
+  addition6(type:WheelAdditionType.addition10x,positionScaleX: 0.3,positionScaleY: 0.12),
+  addition7(type:WheelAdditionType.addition10x,positionScaleX: 0.6,positionScaleY: 0.18),
+  addition8(type:WheelAdditionType.addition1x,positionScaleX: 1,positionScaleY: 0.25),
+  addition9(type:WheelAdditionType.addition5x,positionScaleX: 1.2,positionScaleY: 0.45),
+  addition10(type:WheelAdditionType.addition3x,positionScaleX: -0.2,positionScaleY: 0.36);
 
   final WheelAdditionType type;
   final double positionScaleX;
@@ -125,10 +125,10 @@ enum EnableEffectAdditionType{
 
 enum EnableEffectSymbolType{
 
-  symbol1(type:RollerSymbolType.ratio3x,width:278.4,height: 227.2 ,positionScaleX: -0.5,positionScaleY: 0.38,movePositionScaleX: 0.75,movePositionScaleY: 0.55),
-  symbol2(type:RollerSymbolType.ratio10x,width:278.4,height: 227.2,positionScaleX: -0.5,positionScaleY: 0.25,movePositionScaleX: 0.75,movePositionScaleY: 0.63),
-  symbol3(type:RollerSymbolType.ratio15x,width:278.4,height: 227.2,positionScaleX: -0.5,positionScaleY: 0.315,movePositionScaleX: 0.75,movePositionScaleY: 0.68),
-  symbol4(type:RollerSymbolType.wheelEX,width:278.4,height: 227.2,positionScaleX: -0.5,positionScaleY: 0.2,movePositionScaleX:0.75,movePositionScaleY: 0.72);
+  symbol1(type:RollerSymbolType.ratio3x,width:200,height: 160 ,positionScaleX: -0.3,positionScaleY: 0.38,movePositionScaleX: 0.74,movePositionScaleY: 0.5),
+  symbol2(type:RollerSymbolType.ratio10x,width:200,height: 160,positionScaleX: -0.3,positionScaleY: 0.25,movePositionScaleX: 0.74,movePositionScaleY: 0.6),
+  symbol3(type:RollerSymbolType.ratio15x,width:200,height: 160,positionScaleX: -0.3,positionScaleY: 0.315,movePositionScaleX: 0.74,movePositionScaleY: 0.65),
+  symbol4(type:RollerSymbolType.wheelEX,width:200,height: 160,positionScaleX: -0.3,positionScaleY: 0.2,movePositionScaleX:0.74,movePositionScaleY: 0.7);
 
 
   final RollerSymbolType type;

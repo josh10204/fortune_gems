@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:fortune_gems/extension/position_component_extension.dart';
 import 'package:fortune_gems/widget/icon_button.dart';
 
-class SettingMenuComponent extends SpriteComponent  with HasVisibility {
+class SettingMenuComponent extends PositionComponent {
   SettingMenuComponent({super.position,super.size,required this.onTap}) : super();
   final void Function() onTap;
 
@@ -23,13 +23,22 @@ class SettingMenuComponent extends SpriteComponent  with HasVisibility {
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load('images/setting_menu_background.png');
     super.onLoad();
 
+    await _initMenuBackground();
     _initSpinSettingButton();
     _initAboutButton();
     _initSoundSettingButton();
 
+  }
+
+  Future<void> _initMenuBackground() async {
+
+    Sprite sprite = await Sprite.load('images/setting_menu_background.png');
+    Vector2 boxSize = size;
+    NineTileBox nineTileBox = NineTileBox.withGrid(sprite,leftWidth: 8,rightWidth: 8,topHeight: 8,bottomHeight: 26);
+    NineTileBoxComponent menuBackgroundComponent = NineTileBoxComponent(nineTileBox: nineTileBox, position: size / 2, size: boxSize, anchor: Anchor.center,);
+    add(menuBackgroundComponent);
   }
 
   void _initSpinSettingButton(){

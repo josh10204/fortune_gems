@@ -80,7 +80,6 @@ class DemoData{
           "exLuckyRatio": 0,
           "luckyPlayResult": 0,
         }
-
       ],
       "viewOrderId": "EG01_20240617172220091000052",
       "status": 1

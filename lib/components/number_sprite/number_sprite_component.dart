@@ -43,7 +43,7 @@ class NumberSpriteComponent extends PositionComponent {
       NumberType numberType = numberTypeList[0];
       double width = numberType.width * fontScale;
       double height = numberType.height * fontScale;
-      double positionY = basicHeight - height;
+      double positionY = basicHeight/2 - height/2;
       NumberSpriteDigitsItem digitsItem  = NumberSpriteDigitsItem(numberType: numberType,position: Vector2(positionX,positionY),size: Vector2(width,height));
       _basicComponent.add(digitsItem);
       basicWidth += width;

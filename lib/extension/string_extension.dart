@@ -97,4 +97,20 @@ extension StringExtension on String{
     }
   }
 
+  WheelAdditionType get getWheelAdditionType{
+    try{
+      switch(this){
+        case '1': return WheelAdditionType.addition1x;
+        case '2': return WheelAdditionType.addition2x;
+        case '3': return WheelAdditionType.addition3x;
+        case '5': return WheelAdditionType.addition5x;
+        case '10': return WheelAdditionType.addition10x;
+        case '15': return WheelAdditionType.addition15x;
+      }
+      return WheelAdditionType.addition1x;
+    }catch(e){
+      return WheelAdditionType.addition1x;
+    }
+  }
+
 }

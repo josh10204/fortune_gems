@@ -51,7 +51,7 @@ class IconButton extends PositionComponent  with TapCallbacks {
 
   void _initTextComponent(){
     String text = textString??'';
-    double fontSize = 40;
+    double fontSize = 25;
     double positonX = localCenter.x ;
     double positonY = localCenter.y ;
     _textComponent = TextComponent(

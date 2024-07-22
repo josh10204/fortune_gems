@@ -10,13 +10,13 @@ import 'package:fortune_gems/components/grid_menu/grid_menu_component.dart';
 import 'package:fortune_gems/system/global.dart';
 
 class GridMenuItem extends PositionComponent  with TapCallbacks {
-  GridMenuItem({super.position,required this.gridItems,required this.isSelectItem, required this.onTap}) : super();
+  GridMenuItem({super.position,super.size,required this.gridItems,required this.isSelectItem, required this.onTap}) : super();
   final void Function(GridItems) onTap;
   final GridItems gridItems;
   late Global _global;
 
   bool isSelectItem;
-  late RectangleComponent _backgroundComponent;
+  late NineTileBoxComponent _backgroundComponent;
   late TextComponent _textComponent;
 
 
@@ -34,7 +34,6 @@ class GridMenuItem extends PositionComponent  with TapCallbacks {
   Future<void> onLoad() async {
     super.onLoad();
     _global = Global();
-    size = Vector2(210, 120);
     _initSelectBackground();
     _initText();
   }
@@ -49,19 +48,20 @@ class GridMenuItem extends PositionComponent  with TapCallbacks {
       text:bet.toString(),
       textRenderer: TextPaint(
         style: TextStyle(
-          fontSize: 48.0,
+          fontSize: 25.0,
           color: BasicPalette.white.color,
         ),
       ),
-      // angle: Anchor.center,
       anchor: Anchor.center,
       position: size/2,
     );
     add(_textComponent);
   }
 
-  void _initSelectBackground(){
-    _backgroundComponent = RectangleComponent(size: size,position: localCenter, anchor: Anchor.center, paint: Paint()..color = Colors.yellow.withOpacity(0.3),);
+  Future<void> _initSelectBackground() async {
+    Sprite sprite = await Sprite.load('images/bet_menu_choose.png');
+    NineTileBox nineTileBox = NineTileBox(sprite, destTileSize: 7);
+    _backgroundComponent = NineTileBoxComponent(nineTileBox: nineTileBox, position:localCenter , size: size,anchor: Anchor.center);
     if(isSelectItem){
       add(_backgroundComponent);
     }

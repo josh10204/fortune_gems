@@ -99,6 +99,13 @@ class MachineControllerComponent extends PositionComponent {
     remove(_settingMenu);
   }
 
+
+  void hideExtraMenu(){
+    if(_isShowExtraMenu == false) return;
+    _isShowExtraMenu = false;
+    _extraMenu.closeExtraMenu();
+  }
+
   void updateWinAmount(double winAmount){
     _winAmountText.text = winAmount.toStringAsFixed(2);
     if(winAmount>0){
@@ -445,8 +452,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initSettingMenu(){
-    double buttonWidth = 138;
-    double buttonHeight = 404;
+    double buttonWidth = 100;
+    double buttonHeight = 360;
     double positonX = _settingButton.position.x + _settingButton.size.x/2 - buttonWidth/2;
     double positonY = _settingButton.y - buttonHeight -30;
     _settingMenu = SettingMenuComponent(
@@ -459,8 +466,8 @@ class MachineControllerComponent extends PositionComponent {
   }
 
   void _initBetMenu(){
-    double buttonWidth = 632;
-    double buttonHeight = 595;
+    double buttonWidth = 320;
+    double buttonHeight = 420;
     double positonX = _betButton.position.x + _betButton.size.x/2 - buttonWidth/2;
     double positonY = _betButton.y - buttonHeight - 30;
     _betMenu = GridTextMenuComponent(

@@ -78,14 +78,14 @@ class TestParticleComponent extends ParticleSystemComponent{
 
 
     Particle particle4 = Particle.generate(
-      count: 50,
+      count: 100,
       lifespan: 5,
       generator: (i) => AcceleratedParticle(
           child: SpriteAnimationParticle(
             // lifespan: sprites.length * 0.1,
             alignAnimationTime: false,
             animation: animation,
-            size: Vector2.all(150),
+            size: Vector2.all(100),
           ),
           // acceleration: randomVector(),
           acceleration: Vector2(0, 0),  // Simulate gravity
